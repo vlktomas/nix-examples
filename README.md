@@ -2,7 +2,7 @@
 
 This repository serves as comprehesive list of Nix examples for various technologies. The main goal of these examples is to be as simple as possible, has the same interface and demonstrate possibilities of Nix. Note that examples are created only with official tools available in Nixpkgs. Some examples could be done better with unofficial tools, but using the most effecient solution at any cost is not purpose of these examples.
 
-Each project contains from five to nine .nix files:
+Each project contains from five to nine `.nix` files:
 
 * `nixpkgs.nix` -- pin of Nixpkgs and its configuration and overlays
 * `app.nix` -- app derivation (can be easily integrated into Nixpkgs tree or own packages tree)
@@ -85,17 +85,19 @@ Overview of available ways of getting dependencies in examples by dependency too
 
  * This repo contains source code of common public projects as is. Source files are included in repo only for convenience. If you think that it's violating some license rules please let me know. But keep in mind that this is not real project, included source files are not used for commercial reasons.
 
- * Some source code of projects had to be a little bit modified. For example JavaScript cowsay repo does not contain package-lock.json, so this file is added. See section 'Example specific notes' below for other changes.
+ * Some source code of projects had to be a little bit modified. For example JavaScript cowsay repo does not contain `package-lock.json`, so this file was added. See section 'Example specific notes' below for other changes.
 
- * Each example is self contained and do not have dependency on other files out of its folder. So a lot of code is repeating but it is intentional.
+ * Each example is self contained and does not have dependency on other files out of its folder. So a lot of code is repeating but it is intentional.
 
  * In Nix, arguments of package are not distinguished. The examples follow convention that, dependencies are listed first, and then the other arguments.
 
- * Each project has boolean arg `localFiles`, which switches between sources from remote repository and local files. But most of projects does not have own repository, so remote sources fetching will not work.
+ * Each project has boolean arg `localFiles`, which switches between sources from remote repository and local files. But most of the projects do not have own repository, so remote sources fetching will not work.
 
  * There is copy of `nixpkgs-19.09.tar.gz` included in repo. It is to keep examples working even if Nixpkgs will be completely changed in future.
 
  * This project was created as part of my thesis at Brno University of Technology.
+
+ * Any help or feedback is really appreciated.
 
 ### Example specific notes:
 
@@ -126,149 +128,200 @@ Overview of available ways of getting dependencies in examples by dependency too
 
 ## Common commands
 
+If you do not have Nix installed, you can use Docker to build image:
 ```bash
-# If you do not have nix installed, you can use docker to build image
-docker build -t nix/my-hello:dev . -f Dockerfile-nix
+docker build -t nix/my-hello:dev . -f Dockerfile
+```
 
-# Create container and detach. The project files and nixpkgs must be mounted (if you don't have nixpkgs just clone nixpkgs repository change path in below command)
+Create container and detach. The project files and Nixpkgs must be mounted (if you don't have Nixpkgs just clone Nixpkgs repository and change path in command below):
+```bash
 docker run --detach \
     --name nix-my-hello \
     --mount type=bind,source="$(pwd)",target=/mnt \
-    # only if nixpkgs are not in container
+    # only if Nixpkgs are not in container
     #--mount type=bind,source=$HOME/.nix-defexpr/channels/nixpkgs,target=/nix/var/nix/profiles/per-user/root/channels/nixpkgs \
     -t nix/my-hello:dev
+```
 
-# To get into container run
+To get into container run:
+```bash
 docker exec -it nix-my-hello bash
+```
 
-# Every nix related command written below can be executed in container by (executed in /mnt dir)
+Every Nix related command written below can be executed in container by (executed in `/mnt` dir):
+```bash
 docker exec nix-my-hello <command>
+```
 
-# For interactive shell (probably used only for nix-shell) specify the -i argument
+For interactive shell specify the `-i` argument:
+```bash
 docker exec -it nix-my-hello nix-shell --pure
+```
 
-# Or create container run command and clean up
+Or create container, run command and clean up:
+```bash
 docker run --rm \
     --name nix-my-hello \
     --mount type=bind,source="$(pwd)",target=/mnt \
     # only if nixpkgs are not in container
     #--mount type=bind,source=$HOME/.nix-defexpr/channels/nixpkgs,target=/nix/var/nix/profiles/per-user/root/channels/nixpkgs \
     -it nix/my-hello:dev <command>
+```
 
-# It will then start an interactive shell in which all environment variables 
-# defined by the derivation path have been set to their corresponding values, 
-# and the script $stdenv/setup has been sourced, so functions from setup.sh 
-# can be used in shell.
+This will start an interactive shell in which all environment variables defined by the derivation path have been set to their corresponding values, and the script `$stdenv/setup` has been sourced, so functions from `setup.sh` can be used in shell:
+```bash
 nix-shell --pure
+```
 
-# If you customize your .bashrc then you might have some error when running nix-shell --pure.
-# It is recommended to stop evaluating .bashrc when in nix-shell, by adding this line at the begining of .bashrc
+If you customized your `.bashrc`, then you might have some error when running `nix-shell --pure`. It is recommended to stop evaluating `.bashrc` when in `nix-shell`, by adding this line at the begining of `.bashrc`:
+```bash
 if [[ -n $IN_NIX_SHELL ]]; then return; fi
+```
 
-# If the derivation defines the variable shellHook, it will be evaluated after
-# $stdenv/setup has been sourced. Since this hook is not executed by regular Nix
-# builds, it allows you to perform initialisation specific to nix-shell. For
-# example, the derivation attribute
-#    shellHook =executes the command in a non-interactive shell
-#        ''
-#          echo "Hello shell"
-#        '';
+If the derivation defines the atribute `shellHook`, it will be evaluated after `$stdenv/setup` has been sourced. Since this hook is not executed by regular Nix builds, it allows you to perform initialisation specific to `nix-shell`:
+```nix
+shellHook = ''
+  echo "Hello shell"
+'';
+```
 
-# executes the command in a non-interactive shell
+Execute the command in a non-interactive shell:
+```bash
 nix-shell --run cmd
 nix run --command cmd
+```
 
-# when using nix-shell gc root is not created
-
-# build app, creates result symlink and gc root
+Build app and create result symlink, which is registered as GC root (note that when you are using `nix-shell`, then GC root is not created):
+```bash
 nix-build
+```
 
-# install dependencies to environment
+Install app dependencies into user environment:
+```bash
 nix-env -f default.nix -i -A 'buildInputs'
+```
 
-# install app to environment
+Install app into user environment:
+```bash
 nix-env -f default.nix -i
+```
 
-# add overlay to nixpkgs (~/.config/nixpkgs/overlays). App has derivation definition for example in ~/.config/nixpkgs/overlays/pkgs/myApp/default.nix
+Overlays for Nixpkgs can be defined in `~/.config/nixpkgs/overlays`:
+```nix
 self: super:
-{
-  my-app = super.callPackage ./pkgs/my-app { };
-}
+  {
+    my-app = super.callPackage ./pkgs/my-app { };
+  }
+```
 
-# export closure (NAR archive)
+Export closure:
+```bash
 nix-store --export $(nix-store -qR $(type -p my-app)) > my-app.closure
+```
 
-# extract NAR archive to path (nix-store --export does not create valid NAR archive, nix-store --dump does but it cannot dump whole closure as --export can)
-nix-store --restore path
-
-# import closure (user exceuting this command must be trusted or closure must be signed)
+Import closure (user exceuting this command must be trusted or closure must be signed):
+```bash
 nix-store --import < my-app.closure
+```
 
-# install imported output path (.drv files are not in closure)
+Create closure NAR:
+```bash
+nix-store --dump path
+```
+
+Restore closure NAR archive to path:
+```bash
+nix-store --restore path
+```
+
+Install imported output path (`.drv` files are not in closure):
+```bash
 nix-env -i /nix/store/hash-my-hello-1.0
+```
 
-# copy clousre to remote (non-official nix-deploy utilit can be also used)
+Copy clousre to remote (non-official `nix-deploy` utility can be also used):
+```bash
 nix-copy-closure --to alice@itchy.example.org $(type -p my-app)
+```
 
-# nix-copy-closure will be replaced with nix command in future
+Command `nix-copy-closure` will be replaced with `nix` command in future:
+```bash
 nix copy --to ssh://alice@itchy.example.org $(type -p my-app)
-  To copy Firefox from the local store to a binary cache in file:///tmp/cache:
-  $ nix copy --to file:///tmp/cache $(type -p firefox)
+```
 
-  To copy the entire current NixOS system closure to another machine via SSH:
-  $ nix copy --to ssh://server /run/current-system
+To copy Firefox from the local store to a binary cache in `file:///tmp/cache`:
+```bash
+nix copy --to file:///tmp/cache $(type -p firefox)
+```
 
-  To copy a closure from another machine via SSH:
-  $ nix copy --from ssh://server /nix/store/a6cnl93nk1wxnq84brbbwr6hxw9gp2w9-blender-2.79-rc2
+To copy the entire current NixOS system closure to another machine via SSH:
+```bash
+nix copy --to ssh://server /run/current-system
+```
 
-# show all dependencies
+To copy a closure from another machine via SSH:
+```bash
+nix copy --from ssh://server /nix/store/a6cnl93nk1wxnq84brbbwr6hxw9gp2w9-blender-2.79-rc2
+```
+
+Show all path dependencies:
+```bash
 nix-store --query --tree /nix/store/hash-my-hello-1.0
+```
 
-# show only references (first level dependencies)
+Show only path references (first level dependencies):
+```bash
 nix-store --query --references /nix/store/hash-my-hello-1.0
+```
 
-# show derivation
+Show derivation:
+```bash
 nix show-derivation /nix/store/hash-my-hello-1.0.drv
+```
 
-# check CI job 
+Run CI job:
+```bash
 nix-build ci.nix -A build --no-out-link
+```
 
-# on CI server we can set number of build jobs by --max-jobs argument (maximum of building derivation jobs in parallel)
+On CI server we can set number of build jobs by `--max-jobs` argument (maximum of building derivation jobs in parallel):
+```bash
 nix-build ci.nix -A pipeline --no-out-link --max-jobs auto
+```
 
-# TODO NixOS commands
+TODO NixOS commands
 
-# each machine configuration can be generated in different formats
-nix-community/nixos-generators
+Each machine configuration can be generated in different formats with `nix-community/nixos-generators`.
 
-# create deployment (existing NixOS installation or VirtualBox)
-nixops create ./cd.nix ./cd-nixos.nix -d template
-nixops create ./cd.nix ./cd-vbox.nix -d template-vbox
+Create deployment (existing NixOS installation or VirtualBox):
+```bash
+nixops create ./cd.nix ./cd-nixos.nix -d example
+nixops create ./cd.nix ./cd-vbox.nix -d example-vbox
+```
 
-# apply deployment
-nixops deploy --force-reboot -d template
+Apply deployment:
+```bash
+nixops deploy --force-reboot -d example
+```
 
-# ssh into machine
-nixops ssh -d template webserver
+SSH into machine:
+```bash
+nixops ssh -d example server
+```
 
-# destroy deployment
-nixops destroy -d template
+Destroy deployment:
+```bash
+nixops destroy -d example
+```
 
-# delete deployment
-nixops delete -d trivial
-
-
-# WORFLOW
-
-# Use nix-shell for environment creating (functions from $stdenv/setup can be used)
-# Use language/framework specific utilities
-# If it is done, the CI process can be checked by nix-build (it will copy whole folder to /nix/store)
-# If it is done and in upstream, the CI process can be checked by nix-build (it will download from repository)
+Delete deployment:
+```bash
+nixops delete -d example
 ```
 
 ## License
 
-Each example project may have own licence. All other things in this repo are licensed under GNU/GPL:
+Each example project may has own licence. All other things in this repo are licensed under GNU/GPL:
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

@@ -1,9 +1,9 @@
 { pkgs ? import ./nixpkgs.nix }:
 
-# this file only override default.nix
+# this file only overrides default.nix
 
-# in default.nix you can also use pkgs.lib.inNixShell and specify some
-# derivation attributtes conditionally, if you do not want use this file
+# if you do not want use this file, you can also use pkgs.lib.inNixShell 
+# in default.nix and specify some derivation attributtes conditionally
 
 let 
   app = import ./default.nix { inherit pkgs; localFiles = true; };

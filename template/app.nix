@@ -38,14 +38,14 @@ stdenv.mkDerivation rec {
       # because of changing result symlink
       #./.
 
-      # so you should filter result symlink out
+      # so you should filter out the result symlink
       #builtins.filterSource (path: type: baseNameOf path != "result") ./.;
 
       # if your project contains .gitignore file, you can utilize it to filter out also another unwanted files
       #nix-gitignore.gitignoreSource [ "result" ] ./.
 
       # but source files are stored in Nix store with project folder name
-      # if project folder is renamed, derivation must be rebuild
+      # if project folder is renamed, derivation must be rebuilt
       # see https://github.com/NixOS/nix/issues/1305
       # if you do not want this behaviour, you must rename the path
       # (you can also use stdenv.lib.cleanSourceWith instead of builtins.path)
@@ -60,7 +60,7 @@ stdenv.mkDerivation rec {
       #  }
 
       # another option is to use function fetchGit, but examples in this repostiory do not have own .git folder
-      # so fetchGit function cannot be used, but if you can you should use it instead of nix-gitignore
+      # so fetchGit function cannot be used, but if you can, you should use it instead of nix-gitignore
       builtins.fetchGit { url = ./.; }
     else
       fetchurl {
