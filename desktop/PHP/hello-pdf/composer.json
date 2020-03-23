@@ -1,0 +1,7 @@
+{
+    "name": "exampleapp/exampleapp",
+
+    "require": {
+        "dompdf/dompdf": "^0.8.0"
+    }
+}

@@ -1,0 +1,9 @@
+{
+  server = {
+
+    imports = [
+      ./module.nix
+    ];
+
+  };
+}

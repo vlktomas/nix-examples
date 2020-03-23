@@ -1,0 +1,14 @@
+# stack.yaml docs:
+# https://docs.haskellstack.org/en/stable/yaml_configuration/
+
+resolver: lts-13.26
+
+packages:
+- .
+
+extra-deps: []
+
+flags: {}
+
+extra-package-dbs: []
+
