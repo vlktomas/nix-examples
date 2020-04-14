@@ -101,11 +101,11 @@ Overview of available ways of getting dependencies in examples by dependency too
 
 ### Example specific notes:
 
-- `desktop/JavaScript/cowsay-1.0.4`
+- `desktop/JavaScript/cowsay`
     - Project does not contain `package-lock.json`, so it was added.
     - In `package.json` was removed `rollup -c` from prepublish script.
 
-- `desktop/JavaScript/cowsay-1.0.4-fod`
+- `desktop/JavaScript/cowsay-fod`
     - Project does not contain `package-lock.json`, so it was added.
     - In `package.json` was removed `rollup -c` from prepublish script.
 
@@ -116,7 +116,7 @@ Overview of available ways of getting dependencies in examples by dependency too
     - Composer stores some autoloading info in `vendor` directory. For this reason, depenedcies must be getted as FOD.
     - Files in `database` must be present when getting dependencies.
 
-- `mobile/Android/CardView`
+- `mobile/Android/cardview`
     - To use Android SDK you must set `android_sdk.accept_license = true;` in Nixpkgs config.
 
 - `mobile/Android/myfirstapp`
