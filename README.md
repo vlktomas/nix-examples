@@ -62,7 +62,7 @@ TODO what next? Maybe TypeScript, Rust, Kotlin, Scala, Clojure, Elixir, Dart, We
 
 ### Project dependencies
 
-There are three was to get dependencies when using Nix:
+There are three ways to get dependencies when using Nix:
 
  1. Dependecies can be easily specified by its name in Nix file (dependencies in Nixpkgs).
  2. Dependecies derivations can be generated from some file. For example for NPM you can use `node2nix`.
@@ -128,6 +128,11 @@ Overview of available ways of getting dependencies in examples by dependency too
 
 ## Common commands
 
+Install Nix:
+```bash
+curl https://nixos.org/nix/install | sh
+```
+
 If you do not have Nix installed, you can use Docker to build image:
 ```bash
 docker build -t nix/my-hello:dev . -f Dockerfile
@@ -178,13 +183,6 @@ If you customized your `.bashrc`, then you might have some error when running `n
 if [[ -n $IN_NIX_SHELL ]]; then return; fi
 ```
 
-If the derivation defines the atribute `shellHook`, it will be evaluated after `$stdenv/setup` has been sourced. Since this hook is not executed by regular Nix builds, it allows you to perform initialisation specific to `nix-shell`:
-```nix
-shellHook = ''
-  echo "Hello shell"
-'';
-```
-
 Execute the command in a non-interactive shell:
 ```bash
 nix-shell --run cmd
@@ -194,6 +192,11 @@ nix run --command cmd
 Build app and create result symlink, which is registered as GC root (note that when you are using `nix-shell`, then GC root is not created):
 ```bash
 nix-build
+```
+
+If build fails, you can keep temporary build directory to investigate the problem:
+```bash
+nix-build --keep-failed
 ```
 
 Install app dependencies into user environment:
@@ -286,7 +289,7 @@ nix-build ci.nix -A build --no-out-link
 
 On CI server we can set number of build jobs by `--max-jobs` argument (maximum of building derivation jobs in parallel):
 ```bash
-nix-build ci.nix -A pipeline --no-out-link --max-jobs auto
+nix-build ci.nix -A pipeline --no-out-link --max-jobs auto --keep-going
 ```
 
 TODO NixOS commands

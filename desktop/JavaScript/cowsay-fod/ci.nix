@@ -15,6 +15,9 @@ let
       inherit stdenv autoconf automake libtool;
     };
 
+    # FIXME not working
+    nodeTarball = build.tarball;
+
     debPackage = releaseTools.debBuild {
       diskImage = vmTools.diskImageFuns.debian8x86_64 {};
       src       = build.src;
@@ -34,7 +37,7 @@ let
         description = build.meta.longDescription;
         architectures = [ "amd64" ];
         confinement = "strict";
-        apps.my-hello.command = "${build}/bin/laravel-cli";
+        apps.my-hello.command = "${build}/bin/cowsay";
       };
     };
 
@@ -43,13 +46,13 @@ let
       tag = "latest";
       contents = [ build ];
       config = { 
-        Cmd = [ "/bin/laravel-cli" ];
+        Cmd = [ "/bin/cowsay" ];
       };
     };
 
     ociContainer = ociTools.buildContainer {
       args = [
-        "${build}/bin/laravel-cli"
+        "${build}/bin/cowsay"
       ];
     };
 

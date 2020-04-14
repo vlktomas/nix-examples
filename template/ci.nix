@@ -1,4 +1,4 @@
-{ pkgs ? import ./nixpkgs.nix, localFiles ? true }:
+{ pkgs ? (import ./nixpkgs.nix).pkgs, nixos ? (import ./nixpkgs.nix).nixos, localFiles ? true }:
 
 with pkgs;
 
@@ -104,7 +104,19 @@ let
       ''
     ;
 
-    # TODO testing with QEMU, NixOS, NixOps
+    # TODO testing with QEMU/KVM, NixOS, NixOps
+
+    # TODO testing with NixOps
+    deploy = pkgs.runCommand "${build.pname}-deploy" 
+      {
+        # deploy-only dependencies
+        nativeBuildInputs = [ build pkgs.nixops ];
+      }
+      ''
+        nixops create ${./cd.nix} ${./cd-vbox.nix} -d ${build.pname}
+        nixops deploy -d ${build.pname}
+      ''
+    ;
 
     # jobs executed in parallel
     release = [ tarball debPackage rpmPackage snapPackage dockerImage ociContainer ];

@@ -1,4 +1,4 @@
-{ pkgs ? import ./nixpkgs.nix, localFiles ? true }:
+{ pkgs ? (import ./nixpkgs.nix).pkgs, nixos ? (import ./nixpkgs.nix).nixos, localFiles ? true }:
 
 with pkgs;
 

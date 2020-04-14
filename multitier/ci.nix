@@ -7,6 +7,29 @@ let
 
     build = import ./default.nix { inherit pkgs localFiles; };
 
+    # for all available platforms see https://github.com/NixOS/nixpkgs/blob/master/lib/systems/examples.nix
+    buildLinux64 = import ./default.nix { pkgs = pkgsCross.gnu64; inherit fetchSources; };
+
+    buildLinux32 = import ./default.nix { pkgs = pkgsCross.gnu32; inherit fetchSources; };
+
+    buildWindows32 = import ./default.nix { pkgs = pkgsCross.mingwW64; inherit fetchSources; };
+
+    buildWindows64 = import ./default.nix { pkgs = pkgsCross.mingw32; inherit fetchSources; };
+
+    buildRaspberryPi = import ./default.nix { pkgs = pkgsCross.raspberryPi; inherit fetchSources; };
+
+    buildAndroidAarch64 = import ./default.nix { pkgs = pkgsCross.aarch64-android-prebuilt; inherit fetchSources; };
+
+    buildAndroidArmv7a = import ./default.nix { pkgs = pkgsCross.armv7a-android-prebuilt; inherit fetchSources; };
+
+    buildRiscv64 = import ./default.nix { pkgs = pkgsCross.riscv64; inherit fetchSources; };
+
+    buildRiscv32 = import ./default.nix { pkgs = pkgsCross.riscv32; inherit fetchSources; };
+
+    buildAarch64 = import ./default.nix { pkgs = pkgsCross.aarch64-multiplatform; inherit fetchSources; };
+
+    buildAvr = import ./default.nix { pkgs = pkgsCross.avr; inherit fetchSources; };
+
     tarball = releaseTools.sourceTarball {
       buildInputs = [ gettext texinfo ];
       src = build.src;
@@ -34,7 +57,7 @@ let
         description = build.meta.longDescription;
         architectures = [ "amd64" ];
         confinement = "strict";
-        apps.my-hello.command = "${build}/bin/laravel-cli";
+        apps.my-hello.command = "${build}/bin/example";
       };
     };
 
@@ -43,13 +66,27 @@ let
       tag = "latest";
       contents = [ build ];
       config = { 
-        Cmd = [ "/bin/laravel-cli" ];
+        Cmd = [ "/bin/example" ];
+      };
+    };
+
+    dockerImageFromAnotherImage = dockerTools.buildImage {
+      name = "${build.pname}";
+      tag = "latest";
+      fromImage = dockerTools.buildImage {
+        name = "bash";
+        tag = "latest";
+        contents = [ pkgs.bashInteractive ];
+      };
+      contents = [ build ];
+      config = { 
+        Cmd = [ "/bin/example" ];
       };
     };
 
     ociContainer = ociTools.buildContainer {
       args = [
-        "${build}/bin/laravel-cli"
+        "${build}/bin/example"
       ];
     };
 
@@ -67,7 +104,7 @@ let
       ''
     ;
 
-    # TODO testing with QEMU, NixOS, NixOps
+    # TODO testing with QEMU/KVM, NixOS, NixOps
 
     # jobs executed in parallel
     release = [ tarball debPackage rpmPackage snapPackage dockerImage ociContainer ];
@@ -75,8 +112,20 @@ let
     # jobs executed sequentially
     pipeline = mkPipelineList [ build tests release ];
 
+    # example of combining of multiple pipelines into one
+    # first and second pipelines are executed independently and third pipeline
+    # is executed only if both of pipelines are successful
+    integrationPipeline =
+      let
+        firstPipeline = hello-lib.pipeline;
+        secondPipeline = answer-lib.pipeline;
+        thirdPipeline = server.pipeline;
+      in
+        mkPipeline' (map last [ firstPipeline secondPipeline ]) thirdPipeline;
+
     # if dependencies between the phases are not implicit, these can be explicitly created
-    mkPipeline = phases: pkgs.lib.foldl mkDependency null phases;
+    mkPipeline = mkPipeline' null;
+    mkPipeline' = prev: phases: pkgs.lib.foldl mkDependency prev phases;
 
     # function mkPipeline is sufficient for executing phases in pipeline,
     # but pipeline in form of list is better for further manipulation

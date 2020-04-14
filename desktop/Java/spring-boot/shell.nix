@@ -1,6 +1,6 @@
 { pkgs ? (import ./nixpkgs.nix).pkgs }:
 
-let 
+let
   app = import ./default.nix { inherit pkgs; localFiles = true; };
 in
   app.overrideAttrs (oldAttrs: {
@@ -8,8 +8,7 @@ in
 
     shellHook = 
       ''
-        [ ! -e vendor ] && ln -s ${app.deps} vendor
-        trap "rm vendor" EXIT
+        alias mvn='mvn -Dmaven.repo.local="${app.deps}"'
       '';
   })
 

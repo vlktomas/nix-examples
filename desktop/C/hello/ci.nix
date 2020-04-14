@@ -7,6 +7,29 @@ let
 
     build = import ./default.nix { inherit pkgs localFiles; };
 
+    # for all available platforms see https://github.com/NixOS/nixpkgs/blob/master/lib/systems/examples.nix
+    buildLinux64 = import ./default.nix { pkgs = pkgsCross.gnu64; inherit localFiles; };
+
+    buildLinux32 = import ./default.nix { pkgs = pkgsCross.gnu32; inherit localFiles; };
+
+    buildWindows32 = import ./default.nix { pkgs = pkgsCross.mingwW64; inherit localFiles; };
+
+    buildWindows64 = import ./default.nix { pkgs = pkgsCross.mingw32; inherit localFiles; };
+
+    buildRaspberryPi = import ./default.nix { pkgs = pkgsCross.raspberryPi; inherit localFiles; };
+
+    buildAndroidAarch64 = import ./default.nix { pkgs = pkgsCross.aarch64-android-prebuilt; inherit localFiles; };
+
+    buildAndroidArmv7a = import ./default.nix { pkgs = pkgsCross.armv7a-android-prebuilt; inherit localFiles; };
+
+    buildRiscv64 = import ./default.nix { pkgs = pkgsCross.riscv64; inherit localFiles; };
+
+    buildRiscv32 = import ./default.nix { pkgs = pkgsCross.riscv32; inherit localFiles; };
+
+    buildAarch64 = import ./default.nix { pkgs = pkgsCross.aarch64-multiplatform; inherit localFiles; };
+
+    buildAvr = import ./default.nix { pkgs = pkgsCross.avr; inherit localFiles; };
+
     tarball = releaseTools.sourceTarball {
       buildInputs = [ gettext texinfo ];
       src = build.src;
@@ -34,7 +57,7 @@ let
         description = build.meta.longDescription;
         architectures = [ "amd64" ];
         confinement = "strict";
-        apps.my-hello.command = "${build}/bin/laravel-cli";
+        apps.my-hello.command = "${build}/bin/hello";
       };
     };
 
@@ -43,13 +66,13 @@ let
       tag = "latest";
       contents = [ build ];
       config = { 
-        Cmd = [ "/bin/laravel-cli" ];
+        Cmd = [ "/bin/hello" ];
       };
     };
 
     ociContainer = ociTools.buildContainer {
       args = [
-        "${build}/bin/laravel-cli"
+        "${build}/bin/hello"
       ];
     };
 

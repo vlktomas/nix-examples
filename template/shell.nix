@@ -1,4 +1,4 @@
-{ pkgs ? import ./nixpkgs.nix }:
+{ pkgs ? (import ./nixpkgs.nix).pkgs }:
 
 # this file only overrides default.nix
 
@@ -8,9 +8,23 @@
 let 
   app = import ./default.nix { inherit pkgs; localFiles = true; };
 in
+  pkgs.mkShell {
+    inputsFrom = [ app ];
+    src = null;
+    # we can add some developement only tools as dependency
+    buildInputs =  with pkgs; [ cowsay ];
+  }
+  # but in expression above we can't specify shellHook,
+  # so to specify also shellHook use this:
+  /*
   app.overrideAttrs (oldAttrs: {
     src = null; 
     # we can add some developement only tools as dependency
-    #nativeBuildInputs = oldAttrs.nativeBuildInputs ++ [ pkgs.cowsay ];
+    nativeBuildInputs = oldAttrs.nativeBuildInputs ++ [ pkgs.cowsay ];
+    shellHook = 
+      ''
+        export ANSWER="42"
+      '';
   })
+  */
 

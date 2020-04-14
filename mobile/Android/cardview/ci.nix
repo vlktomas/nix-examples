@@ -5,52 +5,18 @@ with pkgs;
 let
   jobs = rec {
 
-    build = import ./default.nix { inherit pkgs localFiles; };
+    build = buildDebug;
+
+    buildDebug = import ./default.nix { inherit pkgs localFiles; release = false; };
+
+    buildRelease = import ./default.nix { inherit pkgs localFiles; release = true; };
 
     tarball = releaseTools.sourceTarball {
       buildInputs = [ gettext texinfo ];
-      src = build.src;
-      name = build.pname;
-      version = build.version;
+      src = app.src;
+      name = app.pname;
+      version = app.version;
       inherit stdenv autoconf automake libtool;
-    };
-
-    debPackage = releaseTools.debBuild {
-      diskImage = vmTools.diskImageFuns.debian8x86_64 {};
-      src       = build.src;
-      name      = "${build.pname}-${build.version}-deb";
-    };
-
-    rpmPackage = releaseTools.rpmBuild {
-      diskImage = vmTools.diskImageFuns.fedora27x86_64 {};
-      src       = build.src;
-      name      = "${build.pname}-${build.version}-rpm";
-    };
-
-    snapPackage = snapTools.makeSnap {
-      meta = {
-        name = build.pname;
-        summary = build.meta.description;
-        description = build.meta.longDescription;
-        architectures = [ "amd64" ];
-        confinement = "strict";
-        apps.my-hello.command = "${build}/bin/laravel-cli";
-      };
-    };
-
-    dockerImage = dockerTools.buildImage {
-      name = "${build.pname}";
-      tag = "latest";
-      contents = [ build ];
-      config = { 
-        Cmd = [ "/bin/laravel-cli" ];
-      };
-    };
-
-    ociContainer = ociTools.buildContainer {
-      args = [
-        "${build}/bin/laravel-cli"
-      ];
     };
 
     # TODO test with bash script
@@ -67,10 +33,20 @@ let
       ''
     ;
 
-    # TODO testing with QEMU, NixOS, NixOps
+    # TODO testing with AVD emulator
+    emulate = androidenv.emulateApp {
+      name = "emulate-CardView";
+      platformVersion = "24";
+      abiVersion = "x86"; # armeabi-v7a mips, x86, x86_64
+      systemImageType = "default";
+      #useGoogleAPIs = false;
+      app = build;
+      package = "com.example.android.cardview";
+      activity = "CardViewActivity";
+    };
 
     # jobs executed in parallel
-    release = [ tarball debPackage rpmPackage snapPackage dockerImage ociContainer ];
+    release = [ tarball ];
 
     # jobs executed sequentially
     pipeline = mkPipelineList [ build tests release ];

@@ -5,7 +5,9 @@ with lib;
 let
 
   cfg = config.services.example;
-  pkg = import ./default.nix { inherit pkgs };
+  # if app is in the provided pkgs, here should be:
+  #pkg = pkgs.app;
+  pkg = import ./default.nix { inherit pkgs; };
 
 in
 

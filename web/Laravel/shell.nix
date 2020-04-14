@@ -1,4 +1,4 @@
-{ pkgs ? import ./nixpkgs.nix }:
+{ pkgs ? (import ./nixpkgs.nix).pkgs }:
 
 let 
   app = import ./default.nix { inherit pkgs; localFiles = true; };

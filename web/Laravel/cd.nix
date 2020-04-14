@@ -3,6 +3,8 @@
 
   webserver = {nodes, ...}: {
 
+    nixpkgs.pkgs = (import ./nixpkgs.nix).pkgs;
+
     imports = [
       ./module.nix
     ];
@@ -58,6 +60,8 @@
   /*
   databaseserver = {pkgs, ... }: {
 
+    nixpkgs.pkgs = (import ./nixpkgs.nix).pkgs;
+
     deployment.keys.initial-script.text = ''
       CREATE DATABASE IF NOT EXISTS `example`;
       CREATE USER IF NOT EXISTS 'laravel'@'webserver' IDENTIFIED WITH mysql_native_password;
@@ -82,6 +86,8 @@
 
   /*
   fileserver = {
+
+    nixpkgs.pkgs = (import ./nixpkgs.nix).pkgs;
 
     networking.firewall.allowedTCPPorts = [ 111 2049 ];
     networking.firewall.allowedUDPPorts = [ 111 2049 ];

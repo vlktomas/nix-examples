@@ -34,7 +34,7 @@ let
         description = build.meta.longDescription;
         architectures = [ "amd64" ];
         confinement = "strict";
-        apps.my-hello.command = "${build}/bin/laravel-cli";
+        apps.my-hello.command = "${build}/bin/date-utils";
       };
     };
 
@@ -43,13 +43,13 @@ let
       tag = "latest";
       contents = [ build ];
       config = { 
-        Cmd = [ "/bin/laravel-cli" ];
+        Cmd = [ "/bin/date-utils" ];
       };
     };
 
     ociContainer = ociTools.buildContainer {
       args = [
-        "${build}/bin/laravel-cli"
+        "${build}/bin/date-utils"
       ];
     };
 
