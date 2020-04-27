@@ -1,4 +1,13 @@
-{ pkgs ? (import ./nixpkgs.nix).pkgs, localFiles ? true }:
+{ nixpkgsSource ? null, localFiles ? true }:
 
-with pkgs; haskellPackages.callPackage ./app.nix { inherit localFiles; }
+let
+  nixpkgs = import ./nixpkgs.nix { inherit nixpkgsSource localFiles; };
+  pkgs = nixpkgs.pkgs;
+  lib = nixpkgs.lib;
+  appPackage = nixpkgs.appPackage;
+in
 
+  builtins.trace "Nixpkgs version: ${lib.version}"
+  builtins.trace "Use local files: ${lib.boolToString localFiles}"
+
+  appPackage

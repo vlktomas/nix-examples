@@ -1,10 +1,12 @@
-{ pkgs ? (import ./nixpkgs.nix).pkgs }:
+{ nixpkgsSource ? null }:
 
-let 
-  app = import ./default.nix { inherit pkgs; localFiles = true; };
+let
+  nixpkgs = import ./nixpkgs.nix { inherit nixpkgsSource; localFiles = true; };
+  pkgs = nixpkgs.pkgs;
+  lib = nixpkgs.lib;
+  appPackage = nixpkgs.appPackage;
 in
   pkgs.mkShell {
-    inputsFrom = [ app ];
+    inputsFrom = [ appPackage ];
     src = null;
   }
-

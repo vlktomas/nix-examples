@@ -1,117 +1,126 @@
 {
-  network.description = "Laravel";
+  nixpkgsSource ? null,
+  localFiles ? true,
+  appKeyFile ? builtins.toFile "app-key" "APP_KEY=base64:eFMkq9zwjK42i7qXiN04rTKKWhD5FexWO9zetWawTXg=",
+  databasePasswordFile ? builtins.toFile "db-password" "DB_PASSWORD=password",
+  storageLocally ? true,
+  databaseLocally ? true
+}:
 
-  webserver = {nodes, ...}: {
+let
+  nixpkgs = import ./nixpkgs.nix { inherit nixpkgsSource localFiles; };
+  pkgs = nixpkgs.pkgs;
+  lib = nixpkgs.lib;
+in
+  {
 
-    nixpkgs.pkgs = (import ./nixpkgs.nix).pkgs;
+    webserver = {
 
-    imports = [
-      ./module.nix
-    ];
+      nixpkgs.pkgs = pkgs;
 
-    # generated as 'base64:' . base64_encode(random_bytes(32))
-    deployment.keys.app-key.text = "APP_KEY=base64:eFMkq9zwjK42i7qXiN04rTKKWhD5FexWO9zetWawTXg=";
-    deployment.keys.db-password.text = "DB_PASSWORD=password";
+      imports = [
+        ./module.nix
+      ];
 
-    systemd.services.httpd = {
-      after = [ "app-key-key.service" "db-password-key.service" ];
-      wants = [ "app-key-key.service" "db-password-key.service" ];
+      services.laravel = {
+        enable = true;
+        app.keyFile = appKeyFile;
+
+        app.storage = {
+
+          createLocally = storageLocally;
+
+        } // lib.optionalAttrs (!storageLocally) {
+
+          path = "/mnt/data";
+        };
+
+        database = {
+
+          createLocally = databaseLocally;
+
+        } // lib.optionalAttrs (!databaseLocally) {
+
+          host = "dbserver";
+          port = 3306;
+          name = "example";
+          username = "laravel";
+          passwordFile = databasePasswordFile;
+        };
+      };
+
+    } // lib.optionalAttrs (!storageLocally) {
+
+      # when building a VM, filesystems options are overriden and NFS
+      # filesystem will not be mounted, so we must use 'mkVMOverride'
+      fileSystems = pkgs.lib.mkVMOverride {
+        "/mnt/data" = {
+          fsType = "nfs";
+          device = "fileserver:/";
+          options = [ "vers=4" ];
+        };
+      };
     };
 
-    systemd.services.laravel-cron = {
-      after = [ "app-key-key.service" "db-password-key.service" ];
-      wants = [ "app-key-key.service" "db-password-key.service" ];
+  } // lib.optionalAttrs (!storageLocally) {
+
+    fileserver = {
+
+      nixpkgs.pkgs = pkgs;
+
+      networking.firewall.allowedTCPPorts = [ 111 2049 4000 4001 20048 ];
+      networking.firewall.allowedUDPPorts = [ 111 2049 4000 4001 20048 ];
+
+      systemd.tmpfiles.rules = [
+        "d  /export/app                   0777 root root - -"
+        "d  /export/framework             0777 root root - -"
+        "d  /export/framework/sessions    0777 root root - -"
+        "d  /export/framework/views       0777 root root - -"
+        "d  /export/framework/cache       0777 root root - -"
+        "d  /export/logs                  0777 root root - -"
+        "Z  /export                       0777 root root - -"
+      ];
+
+      services.nfs.server = {
+        enable = true;
+        exports = ''
+          /export             webserver(insecure,rw,sync,no_subtree_check,no_root_squash,crossmnt,fsid=0)
+          /export/app         webserver(nohide,insecure,rw,sync,no_subtree_check,no_root_squash)
+          /export/framework   webserver(nohide,insecure,rw,sync,no_subtree_check,no_root_squash)
+          /export/logs        webserver(nohide,insecure,rw,sync,no_subtree_check,no_root_squash)
+        '';
+        lockdPort = 4001;
+        statdPort = 4000;
+      };
+
+      systemd.services.nfs-server = {
+        after = [ "systemd-tmpfiles-setup.service" ];
+        wants = [ "systemd-tmpfiles-setup.service" ];
+      };
     };
 
-    systemd.services.laravel-database-migration = {
-      after = [ "app-key-key.service" "db-password-key.service" ];
-      wants = [ "app-key-key.service" "db-password-key.service" ];
+  } // lib.optionalAttrs (!databaseLocally) {
+
+    dbserver = {
+
+      nixpkgs.pkgs = pkgs;
+
+      networking.firewall.allowedTCPPorts = [ 3306 ];
+
+      services.mysql = {
+        enable = true;
+        initialScript =
+          let
+            databasePassword = lib.removePrefix "DB_PASSWORD=" (lib.fileContents databasePasswordFile);
+          in
+            pkgs.writeText "initial-script" ''
+              CREATE DATABASE IF NOT EXISTS `example`;
+              CREATE USER IF NOT EXISTS 'laravel'@'webserver' IDENTIFIED WITH mysql_native_password;
+              ALTER USER 'laravel'@'webserver' IDENTIFIED BY '${databasePassword}';
+              GRANT ALL PRIVILEGES ON example.* TO 'laravel'@'webserver';
+            '';
+        package = pkgs.mariadb;
+      };
     };
 
-    systemd.services.laravel-database-seed = {
-      after = [ "app-key-key.service" "db-password-key.service" ];
-      wants = [ "app-key-key.service" "db-password-key.service" ];
-    };
-
-    # we can specify storage and database as local services or use another machines
-    services.laravel = {
-      enable = true;
-      database.createLocally = true;
-      #database.seed = true;
-      #database.host = "databaseserver";
-      #database.port = 3306;
-      #database.port = nodes.databaseserver.config.services.mysql.port;
-      #database.name = "example";
-      #database.username = "laravel";
-      #database.passwordFile = "/run/keys/db-password";
-      app.keyFile = "/run/keys/app-key";
-      app.storage.createLocally = true;
-      #app.storage.path = "/mnt/data";
-    };
-
-    /*
-    fileSystems."/mnt/data" = {
-      fsType = "nfs4";
-      device = "fileserver:/var/data";
-    };
-    */
-  };
-
-  /*
-  databaseserver = {pkgs, ... }: {
-
-    nixpkgs.pkgs = (import ./nixpkgs.nix).pkgs;
-
-    deployment.keys.initial-script.text = ''
-      CREATE DATABASE IF NOT EXISTS `example`;
-      CREATE USER IF NOT EXISTS 'laravel'@'webserver' IDENTIFIED WITH mysql_native_password;
-      ALTER USER 'laravel'@'webserver' IDENTIFIED BY 'password';
-      GRANT ALL PRIVILEGES ON example.* TO 'laravel'@'webserver';
-    '';
-
-    networking.firewall.allowedTCPPorts = [ 3306 ];
-
-    services.mysql = {
-      enable = true;
-      initialScript = "/run/keys/initial-script";
-      package = pkgs.mariadb;
-    };
-
-    systemd.services.mysql = {
-      after = [ "initial-script-key.service" ];
-      wants = [ "initial-script-key.service" ];
-    };
-  };
-  */
-
-  /*
-  fileserver = {
-
-    nixpkgs.pkgs = (import ./nixpkgs.nix).pkgs;
-
-    networking.firewall.allowedTCPPorts = [ 111 2049 ];
-    networking.firewall.allowedUDPPorts = [ 111 2049 ];
-
-    systemd.tmpfiles.rules = [
-      "d  /var/data                       0775 root root - -"
-      "d  /var/data/app                   0775 root root - -"
-      "d  /var/data/framework             0775 root root - -"
-      "d  /var/data/framework/sessions    0775 root root - -"
-      "d  /var/data/framework/views       0775 root root - -"
-      "d  /var/data/framework/cache       0775 root root - -"
-      "d  /var/data/logs                  0775 root root - -"
-      "Z  /var/data                       0775 root root - -"
-    ];
-
-    services.nfs.server.enable = true;
-    services.nfs.server.exports = ''
-      /var/data    webserver(rw,nohide,insecure,no_subtree_check)
-    '';
-
-    systemd.services.nfs-server = {
-      after = [ "systemd-tmpfiles-setup.service" ];
-      wants = [ "systemd-tmpfiles-setup.service" ];
-    };
-  };
-  */
-}
+  }

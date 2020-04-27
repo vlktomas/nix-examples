@@ -1,20 +1,24 @@
+# this file should be independent of NixOps
 {
-  server = {
+  nixpkgsSource ? null,
+  localFiles ? true,
+  someSecretFile ? builtins.toFile "some-secret" "SOME_SECRET=secret"
+}:
 
-    nixpkgs.pkgs = (import ./nixpkgs.nix).pkgs;
+let
+  nixpkgs = import ./nixpkgs.nix { inherit nixpkgsSource localFiles; };
+  pkgs = nixpkgs.pkgs;
+  lib = nixpkgs.lib;
+in
+  {
 
-    imports = [
-      ./module.nix
-    ];
+    server = {
 
-    # get some secret from environment variable and store it under /run/ on a temporary filesystem
-    deployment.keys.some-secret.text = builtins.getEnv "SOME_SECRET";
+      nixpkgs.pkgs = pkgs;
 
-    # ensure that key service is loaded before service which needs it
-    systemd.services.example = {
-      after = [ "some-secret-key.service" ];
-      wants = [ "some-secret-key.service" ];
+      imports = [
+        ./module.nix
+      ];
     };
 
-  };
-}
+  }

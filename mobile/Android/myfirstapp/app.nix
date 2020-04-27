@@ -1,6 +1,6 @@
 {
   # dependencies
-  androidenv, fetchurl, nix-gitignore,
+  stdenv, androidenv, fetchurl, nix-gitignore,
 
   # args
   localFiles ? false,

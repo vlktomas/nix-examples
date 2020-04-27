@@ -1,17 +1,19 @@
-{ pkgs ? (import ./nixpkgs.nix).pkgs }:
+{ nixpkgsSource ? null }:
 
-let 
-  app = import ./default.nix { inherit pkgs; localFiles = true; };
+let
+  nixpkgs = import ./nixpkgs.nix { inherit nixpkgsSource; localFiles = true; };
+  pkgs = nixpkgs.pkgs;
+  lib = nixpkgs.lib;
+  appPackage = nixpkgs.appPackage;
 in
-  app.overrideAttrs (oldAttrs: {
-    src = null; 
+  appPackage.overrideAttrs (oldAttrs: {
+    src = null;
 
     # FIXME we must copy node_modules dir
-    shellHook = 
+    shellHook =
       ''
-        [ ! -e node_modules ] && mkdir node_modules && cp -R ${app.deps}/* node_modules
+        [ ! -e node_modules ] && mkdir node_modules && cp -R ${appPackage.deps}/* node_modules
         chmod -R u+w node_modules
         trap "rm -rf node_modules" EXIT
       '';
   })
-

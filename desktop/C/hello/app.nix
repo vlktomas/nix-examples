@@ -23,6 +23,10 @@ stdenv.mkDerivation rec {
 
   doCheck = true;
 
+  passthru = {
+    executable = pname;
+  };
+
   meta = with stdenv.lib; {
     description = "A program that produces a familiar, friendly greeting";
     longDescription = ''

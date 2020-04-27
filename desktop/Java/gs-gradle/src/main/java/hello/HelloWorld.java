@@ -1,11 +1,11 @@
 package hello;
 
-import org.joda.time.LocalTime;
+import org.joda.time.LocalDate;
 
 public class HelloWorld {
   public static void main(String[] args) {
-	LocalTime currentTime = new LocalTime();
-	System.out.println("The current local time is: " + currentTime);
+	LocalDate currentDate = new LocalDate();
+	System.out.println("The current year is: " + currentDate.getYear());
 
 	Greeter greeter = new Greeter();
 	System.out.println(greeter.sayHello());

@@ -80,6 +80,11 @@ stdenv.mkDerivation rec {
       # copy binary to $out/bin
     '';
 
+  # provide some package attributes, for example executable name
+  passthru = {
+    executable = pname;
+  };
+
   meta = with stdenv.lib; {
     description = "Example program";
     longDescription = ''

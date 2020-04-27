@@ -7,7 +7,7 @@
 }:
 
 stdenv.mkDerivation rec {
-  pname = "AntDateUtils";
+  pname = "ant-dateutils";
   version = "1.0";
 
   nativeBuildInputs = [ jdk ant makeWrapper ];
@@ -30,8 +30,12 @@ stdenv.mkDerivation rec {
       mkdir -p $out/bin
       mkdir -p $out/share/java
       cp dist/* $out/share/java/
-      makeWrapper ${jre}/bin/java $out/bin/date-utils --add-flags "-jar $out/share/java/DateUtils.jar"
+      makeWrapper ${jre}/bin/java $out/bin/${pname} --add-flags "-jar $out/share/java/DateUtils.jar"
     '';
+
+  passthru = {
+    executable = pname;
+  };
 
   meta = with stdenv.lib; {
     description = "Java Ant example";

@@ -3,14 +3,9 @@
 with lib;
 
 let
-
   cfg = config.services.example;
-  # if app is in the provided pkgs, here should be:
-  #pkg = pkgs.app;
-  pkg = import ./default.nix { inherit pkgs; };
-
+  pkg = pkgs.example;
 in
-
   {
 
     # interface
@@ -19,6 +14,12 @@ in
 
       enable = mkEnableOption "Example";
 
+      someSecretFile = mkOption {
+        type = nullOr path;
+        default = null;
+        example = "/run/keys/some-secret";
+        description = "A file containing some secret.";
+      };
     };
 
     # implementation
@@ -33,8 +34,12 @@ in
           set -e
           example
         '';
+        serviceConfig = {
+          EnvironmentFile = cfg.someSecretFile;
+          PassEnvironment = "SOME_SECRET";
+        };
       };
 
     };
-  }
 
+  }

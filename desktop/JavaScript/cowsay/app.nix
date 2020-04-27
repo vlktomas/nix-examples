@@ -59,6 +59,7 @@ in
     passthru = {
       tarball = app.tarball;
       shell = app.shell;
+      executable = "cowsay";
     };
 
   })

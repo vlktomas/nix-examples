@@ -1,11 +1,105 @@
-{ pkgs ? (import ./nixpkgs.nix).pkgs, nixos ? (import ./nixpkgs.nix).nixos, localFiles ? true }:
-
-with pkgs;
+{ nixpkgsSource ? null, localFiles ? true }:
 
 let
-  jobs = rec {
 
-    build = import ./default.nix { inherit pkgs localFiles; };
+  nixpkgs = import ./nixpkgs.nix { inherit nixpkgsSource localFiles; };
+  pkgs = nixpkgs.pkgs;
+  lib = nixpkgs.lib;
+  appPackageName = nixpkgs.appPackageName;
+
+  mkPipeline = phases: lib.foldl mkDependency null phases;
+
+  mkPipelineList =
+    let
+      result = phases:
+        if phases == [] then
+          []
+        else
+          (result (lib.init phases)) ++ [ (mkPipeline phases) ];
+    in
+      result;
+
+  mkDependency = prev: next: next.overrideAttrs (oldAttrs: { prev = prev; });
+
+  phase = phaseName: jobs: pkgs.symlinkJoin {
+    name = "phase-${phaseName}";
+    paths = [ jobs ];
+    postBuild = ''
+      echo -e "\033[0;32m<<< completed ${phaseName} phase >>>\033[0m"
+    '';
+  };
+
+  gatherPipelineOutput = pipeline: pkgs.symlinkJoin {
+    name = "pipeline";
+    paths = pipeline;
+  };
+
+in
+
+  with pkgs;
+
+  builtins.trace "Nixpkgs version: ${lib.version}"
+  builtins.trace "Use local files: ${lib.boolToString localFiles}"
+
+  rec {
+
+
+    /*
+     * Build
+     */
+
+    build = pkgs."${appPackageName}";
+
+
+    /*
+     * Test
+     */
+
+    scriptTest = runCommand "${build.pname}-test"
+      { nativeBuildInputs = [ build ]; }
+      ''
+        mkdir -p $out/tests/${build.pname}-test
+        echo "2020" > expected
+        ${build.executable} > given
+        diff expected given > $out/tests/${build.pname}-test/result
+      ''
+    ;
+
+    nixosVmTest = nixosTest {
+      machine = { ... }: {
+        imports = [ ./module.nix ];
+      };
+      testScript = ''
+        machine.start()
+        machine.wait_for_unit("default.target")
+        machine.succeed("${build.executable}")
+      '';
+    };
+
+    nixosVmTestDriver = nixosVmTest.driver;
+
+    nixosVmContainerTest = nixosTest {
+      machine = { ... }: {
+        containers."${build.pname}" = {
+          autoStart = true;
+          config = { ... }: {
+            imports = [ ./module.nix ];
+          };
+        };
+      };
+      testScript = ''
+        machine.start()
+        machine.wait_for_unit("container@${build.pname}.service")
+        machine.succeed("nixos-container run ${build.pname} -- ${build.executable}")
+      '';
+    };
+
+    nixosVmContainerTestDriver = nixosVmContainerTest.driver;
+
+
+    /*
+     * Release
+     */
 
     tarball = releaseTools.sourceTarball {
       buildInputs = [ gettext texinfo ];
@@ -17,14 +111,14 @@ let
 
     debPackage = releaseTools.debBuild {
       diskImage = vmTools.diskImageFuns.debian8x86_64 {};
-      src       = build.src;
-      name      = "${build.pname}-${build.version}-deb";
+      src = build.src;
+      name = "${build.pname}-${build.version}-deb";
     };
 
     rpmPackage = releaseTools.rpmBuild {
       diskImage = vmTools.diskImageFuns.fedora27x86_64 {};
-      src       = build.src;
-      name      = "${build.pname}-${build.version}-rpm";
+      src = build.src;
+      name = "${build.pname}-${build.version}-rpm";
     };
 
     snapPackage = snapTools.makeSnap {
@@ -34,7 +128,7 @@ let
         description = build.meta.longDescription;
         architectures = [ "amd64" ];
         confinement = "strict";
-        apps.my-hello.command = "${build}/bin/date-utils";
+        apps."${build.pname}".command = "${build}/bin/${build.executable}";
       };
     };
 
@@ -42,58 +136,74 @@ let
       name = "${build.pname}";
       tag = "latest";
       contents = [ build ];
-      config = { 
-        Cmd = [ "/bin/date-utils" ];
+      config = {
+        Cmd = [ "/bin/${build.executable}" ];
       };
     };
 
     ociContainer = ociTools.buildContainer {
       args = [
-        "${build}/bin/date-utils"
+        "${build}/bin/${build.executable}"
       ];
     };
 
-    # TODO test with bash script
-    tests = pkgs.runCommand "${build.pname}-tests" 
-      {
-        # tests-only dependencies
-        nativeBuildInputs = [ build ];
-      }
-      ''
-        mkdir -p $out
-        echo "Hello world" > expected
-        example > given
-        diff expected given > $out/result
-      ''
-    ;
+    nixosIso = (
+      nixos (
+          { config, modulesPath, ... }: {
+            imports = [
+              "${toString modulesPath}/installer/cd-dvd/iso-image.nix"
+              ./module.nix
+            ];
+            isoImage.makeEfiBootable = true;
+            isoImage.makeUsbBootable = true;
+            users.users.root.password = "nixos";
+          }
+        )
+      ).config.system.build.isoImage;
 
-    # TODO testing with QEMU, NixOS, NixOps
+    nixosVm = (
+      nixos (
+          { config, modulesPath, ... }: {
+            imports = [
+              "${toString modulesPath}/virtualisation/qemu-vm.nix"
+              ./module.nix
+            ];
+            users.users.root.password = "nixos";
+          }
+        )
+      ).config.system.build.vm;
 
-    # jobs executed in parallel
-    release = [ tarball debPackage rpmPackage snapPackage dockerImage ociContainer ];
 
-    # jobs executed sequentially
-    pipeline = mkPipelineList [ build tests release ];
+    /*
+     * Pipeline
+     */
 
-    # if dependencies between the phases are not implicit, these can be explicitly created
-    mkPipeline = phases: pkgs.lib.foldl mkDependency null phases;
+    pipeline = mkPipelineList [
+      (
+        phase "build" [
+          build
+        ]
+      )
+      (
+        phase "test" [
+          scriptTest
+          nixosVmTest
+          nixosVmContainerTest
+        ]
+      )
+      (
+        phase "release" [
+          #tarball
+          #debPackage
+          #rpmPackage
+          #snapPackage
+          #dockerImage
+          #ociContainer
+          #nixosIso
+        ]
+      )
+    ];
 
-    # function mkPipeline is sufficient for executing phases in pipeline,
-    # but pipeline in form of list is better for further manipulation
-    mkPipelineList =
-      let
-        result = phases:
-          if phases == [] then
-            []
-          else
-            (result (pkgs.lib.init phases)) ++ [ (mkPipeline phases) ];
-      in
-        result;
+    pipelineJob = gatherPipelineOutput pipeline;
 
-    # helper function to create ad-hoc dependency between two derivations
-    mkDependency = prev: next: next.overrideAttrs (oldAttrs: { prev = prev; });
-
-  };
-in
-  jobs
-
+  }

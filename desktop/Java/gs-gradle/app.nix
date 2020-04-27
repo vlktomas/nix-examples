@@ -27,7 +27,7 @@ let
         }
     );
 
-    buildPhase = 
+    buildPhase =
       ''
         export GRADLE_USER_HOME=$(mktemp -d);
         # add task to download dependencies to build.gradle
@@ -43,7 +43,7 @@ let
 
     # Mavenize dependency paths
     # e.g. org.codehaus.groovy/groovy/2.4.0/{hash}/groovy-2.4.0.jar -> org/codehaus/groovy/groovy/2.4.0/groovy-2.4.0.jar
-    installPhase = 
+    installPhase =
       ''
         find $GRADLE_USER_HOME/caches/modules-2 -type f -regex '.*\.\(jar\|pom\)' \
           | perl -pe 's#(.*/([^/]+)/([^/]+)/([^/]+)/[0-9a-f]{30,40}/([^/\s]+))$# ($x = $2) =~ tr|\.|/|; "install -Dm444 $1 \$out/$x/$3/$4/$5" #e' \
@@ -92,7 +92,7 @@ in
         }
     );
 
-    buildPhase = 
+    buildPhase =
       ''
         export GRADLE_USER_HOME=$(mktemp -d)
         # point to local deps repo
@@ -109,6 +109,7 @@ in
 
     passthru = {
       inherit deps;
+      executable = pname;
     };
 
     meta = with stdenv.lib; {

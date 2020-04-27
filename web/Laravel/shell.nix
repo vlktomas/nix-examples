@@ -1,22 +1,24 @@
-{ pkgs ? (import ./nixpkgs.nix).pkgs }:
+{ nixpkgsSource ? null }:
 
-let 
-  app = import ./default.nix { inherit pkgs; localFiles = true; };
+let
+  nixpkgs = import ./nixpkgs.nix { inherit nixpkgsSource; localFiles = true; };
+  pkgs = nixpkgs.pkgs;
+  lib = nixpkgs.lib;
+  appPackage = nixpkgs.appPackage;
 in
-  app.overrideAttrs (oldAttrs: {
-    src = null; 
+  appPackage.overrideAttrs (oldAttrs: {
+    src = null;
 
-    nativeBuildInputs = oldAttrs.nativeBuildInputs ++ [ app.nodeShell ];
+    nativeBuildInputs = oldAttrs.nativeBuildInputs ++ [ appPackage.nodeShell ];
 
     # FIXME for laravel we must copy vendor dir and run composer dump-autoload
-    shellHook = 
+    shellHook =
       ''
-        [ ! -e vendor ] && mkdir vendor && cp -R ${app.phpDeps}/* vendor
+        [ ! -e vendor ] && mkdir vendor && cp -R ${appPackage.phpDeps}/* vendor
         chmod -R u+w vendor
         composer dump-autoload
-        ln -s ${app.nodePackage}/lib/node_modules/laravel-node-dependencies/node_modules node_modules
+        ln -s ${appPackage.nodePackage}/lib/node_modules/laravel-node-dependencies/node_modules node_modules
         alias cross-env='true &&'
         trap "rm -rf vendor node_modules" EXIT
       '';
   })
-

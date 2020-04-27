@@ -1,14 +1,17 @@
-{ pkgs ? (import ./nixpkgs.nix).pkgs }:
+{ nixpkgsSource ? null }:
 
-let 
-  app = import ./default.nix { inherit pkgs; localFiles = true; };
+let
+  nixpkgs = import ./nixpkgs.nix { inherit nixpkgsSource; localFiles = true; };
+  pkgs = nixpkgs.pkgs;
+  lib = nixpkgs.lib;
+  appPackage = nixpkgs.appPackage;
 in
-  app.overrideAttrs (oldAttrs: {
-    src = null; 
+  appPackage.overrideAttrs (oldAttrs: {
+    src = null;
 
-    shellHook = 
+    shellHook =
       ''
-        [ ! -e vendor ] && ln -s ${app.deps} vendor
+        [ ! -e vendor ] && ln -s ${appPackage.deps} vendor
         trap "rm vendor" EXIT
       '';
   })

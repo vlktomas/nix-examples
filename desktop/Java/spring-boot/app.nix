@@ -13,7 +13,7 @@ let
   sha256 = stdenv.lib.fakeSha256;
 
   mavenJdk11 = maven.overrideAttrs (oldAttrs: {
-    jdk = jdk11; 
+    jdk = jdk11;
   });
 
   deps = stdenv.mkDerivation rec {
@@ -40,7 +40,7 @@ let
     outputHashMode = "recursive";
     outputHashAlgo = "sha256";
     #outputHash = stdenv.lib.fakeSha256;
-    outputHash = "0d4ncaviqzff6hmvim3xkjlgd4scmr3xd5n2ah7n9ihsga3ffviq";
+    outputHash = "0wa2kxjgszskxhwk02i0azd810bi6limdmh50ima8b5z5cfm9zp7";
   };
 in
   stdenv.mkDerivation rec {
@@ -61,7 +61,7 @@ in
     # TODO update example to spring boot 2.2.3 or 2.2:4 or 2.2.5 where maven-jar-plugin is updated to 3.2.0 and check that jar contains files with right timestamps
     buildPhase =
       ''
-        # property project.build.outputTimestamp is supported in maven-jar-plugin as of 3.2.0, 
+        # property project.build.outputTimestamp is supported in maven-jar-plugin as of 3.2.0,
         # in older versions produced JAR contains timestamps and therefore is not reproducible
         # morover we must update timestamp of pom.xml, because jre cannot load jar files where the modified day or month is 0
         touch pom.xml
@@ -73,11 +73,12 @@ in
         mkdir -p $out/share/java
         cp target/demo-0.0.1-SNAPSHOT.jar $out/share/java/demo-0.0.1-SNAPSHOT.jar
         mkdir -p $out/bin
-        makeWrapper ${adoptopenjdk-jre-hotspot-bin-11}/bin/java $out/bin/spring-boot --add-flags "-jar $out/share/java/demo-0.0.1-SNAPSHOT.jar"
+        makeWrapper ${adoptopenjdk-jre-hotspot-bin-11}/bin/java $out/bin/${pname} --add-flags "-jar $out/share/java/demo-0.0.1-SNAPSHOT.jar"
       '';
 
     passthru = {
       inherit deps;
+      executable = pname;
     };
 
     meta = with stdenv.lib; {

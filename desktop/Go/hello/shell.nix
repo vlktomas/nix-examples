@@ -1,9 +1,10 @@
-{ pkgs ? (import ./nixpkgs.nix).pkgs }:
+{ nixpkgsSource ? null }:
 
-let 
-  app = import ./default.nix { inherit pkgs; localFiles = true; };
-
-  lib = pkgs.lib;
+let
+  nixpkgs = import ./nixpkgs.nix { inherit nixpkgsSource; localFiles = true; };
+  pkgs = nixpkgs.pkgs;
+  lib = nixpkgs.lib;
+  appPackage = nixpkgs.appPackage;
 
   # Extra sources to include in the gopath
   extraSrcs = [ ];
@@ -14,8 +15,8 @@ let
 
   goPath = extraSrcs;
 in
-  app.overrideAttrs (oldAttrs: {
-    src = null; 
+  appPackage.overrideAttrs (oldAttrs: {
+    src = null;
 
     # restore shellHook from older version of buildGoModule
     shellHook = ''
@@ -28,4 +29,3 @@ in
       export GOPATH=${lib.concatStringsSep ":" ( ["$d"] ++ ["$GOPATH"] ++ ["$PWD"] ++ extraSrcPaths)}
     '';
   })
-

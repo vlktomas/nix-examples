@@ -25,6 +25,10 @@ buildGoModule rec {
 
   subPackages = [ "." ];
 
+  passthru = {
+    executable = "main";
+  };
+
   meta = with stdenv.lib; {
     description = "Hello world example in Go";
     homepage = https://blog.golang.org/using-go-modules;

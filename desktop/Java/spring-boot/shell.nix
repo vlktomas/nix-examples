@@ -1,14 +1,17 @@
-{ pkgs ? (import ./nixpkgs.nix).pkgs }:
+{ nixpkgsSource ? null }:
 
 let
-  app = import ./default.nix { inherit pkgs; localFiles = true; };
+  nixpkgs = import ./nixpkgs.nix { inherit nixpkgsSource; localFiles = true; };
+  pkgs = nixpkgs.pkgs;
+  lib = nixpkgs.lib;
+  appPackage = nixpkgs.appPackage;
 in
-  app.overrideAttrs (oldAttrs: {
-    src = null; 
+  appPackage.overrideAttrs (oldAttrs: {
+    src = null;
 
-    shellHook = 
+    shellHook =
       ''
-        alias mvn='mvn -Dmaven.repo.local="${app.deps}"'
+        alias mvn='mvn -Dmaven.repo.local="${appPackage.deps}"'
       '';
   })
 

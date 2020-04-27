@@ -6,7 +6,7 @@
   localFiles ? false
 }:
 
-let 
+let
 
   url = "https://example.com";
   sha256 = stdenv.lib.fakeSha256;
@@ -31,7 +31,7 @@ let
 
 in
 
-  haskell.lib.overrideCabal package (old: { 
+  haskell.lib.overrideCabal package (old: {
     enableSharedExecutables = true;
     src = (
       if localFiles then
@@ -41,6 +41,10 @@ in
           inherit url sha256;
         }
     );
+    # TODO passthru
+    passthru = {
+      executable = "answer";
+    };
     # TODO meta
   })
 

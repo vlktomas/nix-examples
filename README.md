@@ -2,18 +2,84 @@
 
 This repository serves as comprehesive list of Nix examples for various technologies. The main goal of these examples is to be as simple as possible, has the same interface and demonstrate possibilities of Nix. Note that examples are created only with official tools available in Nixpkgs. Some examples could be done better with unofficial tools, but using the most effecient solution at any cost is not purpose of these examples.
 
-Each project contains from five to nine `.nix` files:
+Each project contains from five to nine `.nix` files and optionally deploy script `cicd.sh`:
 
-* `nixpkgs.nix` -- pin of Nixpkgs and its configuration and overlays
+* `nixpkgs.nix` -- pin of Nixpkgs and its configuration and add app as overlay
 * `app.nix` -- app derivation (can be easily integrated into Nixpkgs tree or own packages tree)
-* `default.nix` -- calls `app.nix` with pinned Nixpkgs
+* `default.nix` -- calls package from pinned Nixpkgs
 * `shell.nix` -- similar to `default.nix`, but overriding some attributes or adding some dev tools
-* `ci.nix` -- set of available CI/CD jobs
+* `ci.nix` -- set of available CI jobs
 * `module.nix` -- app as NixOS module (can be easily integrated into NixOS modules tree or own modules tree)
-* `cd.nix` -- logical deployment specification
-* `cd-*.nix` -- physical deployment specification (for example `cd-vbox.nix` describe deployment to VirtualBox machines)
+* `cd.nix` -- logical deployment specification (independent of NixOps)
+* `cd-*.nix` -- physical deployment specification for NixOps (for example `cd-vbox.nix` describe deployment to VirtualBox machines)
+* `cicd.sh` -- run Nix for CI pipeline and NixOps for deployment
 
 There is template for new example, which contains only these files with some additional info.
+
+## How to use
+
+Run all examples CI pipelines:
+```bash
+nix-build
+```
+
+Build all examples:
+```bash
+nix-build examples.nix -A examplesBuilds
+```
+
+### How to use each example 
+
+Build project:
+```bash
+nix-build
+```
+
+You can switch from local files to remote files:
+```bash
+nix-build --arg localFiles false
+```
+
+You can build project with different Nixpkgs:
+```bash
+nix-build --arg nixpkgsSource "<nixpkgs>"
+nix-build --arg nixpkgsSource "/absolute/path/to/nixpkgs/directory"
+```
+
+Enter development shell (you can use the same arguments as above):
+```bash
+nix-shell
+```
+
+Run CI pipeline and gather all phases outputs to `result` symlink:
+```bash
+nix-build ci.nix -A pipelineJob
+```
+
+Run CI pipeline and create for each phase own `result` symlink:
+```bash
+nix-build ci.nix -A pipeline
+```
+
+Run only some CI job:
+```bash
+nix-build ci.nix -A job
+```
+
+Run only some CI job with no out link:
+```bash
+nix-build ci.nix -A job --no-out-link
+```
+
+Test NixOps deployment in VirtualBox
+```bash
+./cicd.sh deploy-test
+```
+
+Run CI pipeline and deploy with NixOps
+```bash
+./cicd.sh
+```
 
 ## List of example projects and its sources
 
@@ -93,13 +159,16 @@ Overview of available ways of getting dependencies in examples by dependency too
 
  * Each project has boolean arg `localFiles`, which switches between sources from remote repository and local files. But most of the projects do not have own repository, so remote sources fetching will not work.
 
- * There is copy of `nixpkgs-19.09.tar.gz` included in repo. It is to keep examples working even if Nixpkgs will be completely changed in future.
+ * There is copy of `nixpkgs-20.03.tar.gz` included in repo. It is to keep examples working even if Nixpkgs will be completely changed in future.
 
  * This project was created as part of my thesis at Brno University of Technology.
 
  * Any help or feedback is really appreciated.
 
 ### Example specific notes:
+
+- `desktop/Java/ant-dateutils`
+    - Project was modified to print current year instead of current date.
 
 - `desktop/JavaScript/cowsay`
     - Project does not contain `package-lock.json`, so it was added.
@@ -126,7 +195,7 @@ Overview of available ways of getting dependencies in examples by dependency too
     - When deploying Laravel web apps, there is problem with storage path. Unfortunately in Laravel it is not easy to set storage path via `.env`. Changing of `storage_path` in config is not enough, because storage path must be set before config is loaded at all. So you must create `app/Foundation/Application.php` class which extends original Laravel `Application.php` class, in which you change `storage_path`. Next you set new `Application.php` in `bootstrap/app.php` and finnally you can specify `APP_STORAGE_PATH` in `.env`.
     - If local database is used, then user is authenticated via socket authentication. For this reason, in `.env.example` file variable `DB_SOCKET` was added.
 
-## Common commands
+### Other common commands
 
 Install Nix:
 ```bash
@@ -282,11 +351,6 @@ Show derivation:
 nix show-derivation /nix/store/hash-my-hello-1.0.drv
 ```
 
-Run CI job:
-```bash
-nix-build ci.nix -A build --no-out-link
-```
-
 On CI server we can set number of build jobs by `--max-jobs` argument (maximum of building derivation jobs in parallel):
 ```bash
 nix-build ci.nix -A pipeline --no-out-link --max-jobs auto --keep-going
@@ -321,6 +385,17 @@ Delete deployment:
 ```bash
 nixops delete -d example
 ```
+
+## References
+
+* [Nix manual](https://nixos.org/nix/manual/)
+* [Nixpkgs manual](https://nixos.org/nixpkgs/manual/)
+* [Nixops manual](https://nixos.org/nixops/manual/)
+* [Nix Pills](https://nixos.org/nixos/nix-pills/)
+* [NixOS wiki](https://nixos.wiki/)
+* [NixOS/nixpkgs](https://github.com/NixOS/nixpkgs)
+* [nix-community/nixos-generators](https://github.com/nix-community/nixos-generators)
+* [Managing Projects with Nix - Tokyo NixOS Meetup](https://github.com/Tokyo-NixOS/presentations/tree/master/2017/02/)
 
 ## License
 

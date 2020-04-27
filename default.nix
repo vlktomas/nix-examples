@@ -1,4 +1,2 @@
-{ pkgs ? import <nixpkgs> {} }:
-
-(import ./ci.nix { inherit pkgs; }).examplesBuilds
-
+# run all examples pipelines as default action
+(import ./examples.nix).examplesPipelines

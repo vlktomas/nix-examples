@@ -6,7 +6,7 @@
   localFiles ? false
 }:
 
-mkDerivation {
+mkDerivation rec {
 
   pname = "answer";
   version = "0.1.0.0";
@@ -20,6 +20,11 @@ mkDerivation {
         sha256 = stdenv.lib.fakeSha256;
       }
   );
+
+  # TODO passthru
+  passthru = {
+    executable = pname;
+  };
 
   isLibrary = false;
   isExecutable = true;

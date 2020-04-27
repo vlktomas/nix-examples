@@ -1,16 +1,29 @@
-# pin nixpkgs to specific version
-import (fetchTarball https://github.com/NixOS/nixpkgs/archive/19.09.tar.gz) {
-  # we can enforce nixpkgs configuration for making config pure
-  config = {
-    android_sdk.accept_license = true;
-  };
-  
-  # we can specify overlays for adding/modifying packages
-  #overlays = [
-  #  (self: super:
-  #  {
-  #    my-hello = super.callPackage ./app.nix { fetchSources = false; };
-  #  })
-  #];
-}
-
+let
+  defaultNixpkgsSource = fetchTarball https://github.com/NixOS/nixpkgs/archive/20.03.tar.gz;
+in
+  { nixpkgsSource ? null, localFiles ? true }:
+  let
+    nixpkgs =
+      if nixpkgsSource != null then
+        nixpkgsSource
+      else
+        defaultNixpkgsSource;
+  in
+    rec {
+      lib = import "${nixpkgs}/lib";
+      nixos = import "${nixpkgs}/nixos";
+      pkgs = import nixpkgs {
+        config = {
+          android_sdk.accept_license = true;
+        };
+        overlays = [
+          (self: super:
+          {
+            "${appPackageName}" = super.callPackage ./app.nix { inherit localFiles; };
+          })
+        ];
+      };
+      appPackage = pkgs."${appPackageName}";
+      appPackageName = "cardview";
+      outPath = "${nixpkgs}";
+    }

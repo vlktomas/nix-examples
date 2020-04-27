@@ -1,14 +1,13 @@
-{ pkgs ? (import ./nixpkgs.nix).pkgs,
-  localFiles ? true,
-  appKey ? "",
-  appStoragePath ? "storage",
-  dbHost ? "127.0.0.1",
-  dbPort ? "3306",
-  dbSocket ? "",
-  dbName ? "example",
-  dbUsername ? "root",
-  dbPassword ? ""
-}:
+{ nixpkgsSource ? null, localFiles ? true }:
 
-with pkgs; callPackage ./app.nix { inherit localFiles appKey appStoragePath dbHost dbPort dbSocket dbName dbUsername dbPassword; }
+let
+  nixpkgs = import ./nixpkgs.nix { inherit nixpkgsSource localFiles; };
+  pkgs = nixpkgs.pkgs;
+  lib = nixpkgs.lib;
+  appPackage = nixpkgs.appPackage;
+in
 
+  builtins.trace "Nixpkgs version: ${lib.version}"
+  builtins.trace "Use local files: ${lib.boolToString localFiles}"
+
+  appPackage

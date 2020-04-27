@@ -5,11 +5,10 @@
 with lib;
 
 let
-
   cfg = config.services.laravel;
   user = "laravel";
   group = config.services.httpd.group;
-  pkg = import ./default.nix {
+  pkg = pkgs.laravel.override {
     appKey = cfg.app.key;
     appStoragePath = cfg.app.storage.path;
     dbHost = cfg.database.host;
@@ -19,9 +18,7 @@ let
     dbUsername = cfg.database.username;
     dbPassword = cfg.database.password;
   };
-
 in
-
   {
 
     # interface
@@ -182,6 +179,8 @@ in
 
       networking.firewall.allowedTCPPorts = [ 80 443 ];
 
+      security.acme.acceptTerms = true;
+
       systemd.tmpfiles.rules = mkIf cfg.app.storage.createLocally [
         "d  ${cfg.app.storage.path}                       0775 ${user} ${group} - -"
         "d  ${cfg.app.storage.path}/app                   0775 ${user} ${group} - -"
@@ -304,7 +303,7 @@ in
       };
 
       systemd.services.laravel-database-migration = {
-        description = "Run Laravel migrations";
+        description = "Laravel database migrations";
         wantedBy = [ "multi-user.target" ];
         after =
           optional cfg.database.createLocally "mysql.service" ++
@@ -330,7 +329,7 @@ in
       };
 
       systemd.services.laravel-database-seed = mkIf cfg.database.seed {
-        description = "Run Laravel migrations and seeders";
+        description = "Laravel database seed";
         wantedBy = [ "multi-user.target" ];
         after =
           optional cfg.database.createLocally "mysql.service" ++
@@ -359,4 +358,3 @@ in
 
     };
   }
-

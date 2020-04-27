@@ -1,75 +1,113 @@
-{ pkgs ? (import ./nixpkgs.nix).pkgs, nixos ? (import ./nixpkgs.nix).nixos, localFiles ? true }:
-
-with pkgs;
+{ nixpkgsSource ? null, localFiles ? true }:
 
 let
-  jobs = rec {
+
+  nixpkgs = import ./nixpkgs.nix { inherit nixpkgsSource localFiles; };
+  pkgs = nixpkgs.pkgs;
+  lib = nixpkgs.lib;
+  appPackageName = nixpkgs.appPackageName;
+
+  mkPipeline = phases: lib.foldl mkDependency null phases;
+
+  mkPipelineList =
+    let
+      result = phases:
+        if phases == [] then
+          []
+        else
+          (result (lib.init phases)) ++ [ (mkPipeline phases) ];
+    in
+      result;
+
+  mkDependency = prev: next: next.overrideAttrs (oldAttrs: { prev = prev; });
+
+  phase = phaseName: jobs: pkgs.symlinkJoin {
+    name = "phase-${phaseName}";
+    paths = [ jobs ];
+    postBuild = ''
+      echo -e "\033[0;32m<<< completed ${phaseName} phase >>>\033[0m"
+    '';
+  };
+
+  gatherPipelineOutput = pipeline: pkgs.symlinkJoin {
+    name = "pipeline";
+    paths = pipeline;
+  };
+
+in
+
+  with pkgs;
+
+  builtins.trace "Nixpkgs version: ${lib.version}"
+  builtins.trace "Use local files: ${lib.boolToString localFiles}"
+
+  rec {
+
+
+    /*
+     * Build
+     */
 
     build = buildDebug;
 
-    buildDebug = import ./default.nix { inherit pkgs localFiles; release = false; };
+    buildDebug = pkgs."${appPackageName}".override { release = false; };
 
-    buildRelease = import ./default.nix { inherit pkgs localFiles; release = true; };
+    buildRelease = pkgs."${appPackageName}".override { release = true; };
 
-    tarball = releaseTools.sourceTarball {
-      buildInputs = [ gettext texinfo ];
-      src = app.src;
-      name = app.pname;
-      version = app.version;
-      inherit stdenv autoconf automake libtool;
-    };
 
-    # TODO test with bash script
-    tests = pkgs.runCommand "${build.pname}-tests" 
-      {
-        # tests-only dependencies
-        nativeBuildInputs = [ build ];
-      }
-      ''
-        mkdir -p $out
-        echo "Hello world" > expected
-        example > given
-        diff expected given > $out/result
-      ''
-    ;
+    /*
+     * Test
+     */
 
     # TODO testing with AVD emulator
-    emulate = androidenv.emulateApp {
-      name = "emulate-CardView";
-      platformVersion = "24";
-      abiVersion = "x86"; # armeabi-v7a mips, x86, x86_64
+    avdTest = androidenv.emulateApp {
+      name = "emulate-cardview";
+      platformVersion = "28";
+      abiVersion = "x86_64"; # armeabi-v7a mips, x86, x86_64
       systemImageType = "default";
       #useGoogleAPIs = false;
+      enableGPU = true;
       app = build;
       package = "com.example.android.cardview";
       activity = "CardViewActivity";
     };
 
-    # jobs executed in parallel
-    release = [ tarball ];
 
-    # jobs executed sequentially
-    pipeline = mkPipelineList [ build tests release ];
+    /*
+     * Release
+     */
 
-    # if dependencies between the phases are not implicit, these can be explicitly created
-    mkPipeline = phases: pkgs.lib.foldl mkDependency null phases;
+    tarball = releaseTools.sourceTarball {
+      buildInputs = [ gettext texinfo ];
+      src = build.src;
+      name = build.pname;
+      version = build.version;
+      inherit stdenv autoconf automake libtool;
+    };
 
-    # function mkPipeline is sufficient for executing phases in pipeline,
-    # but pipeline in form of list is better for further manipulation
-    mkPipelineList =
-      let
-        result = phases:
-          if phases == [] then
-            []
-          else
-            (result (pkgs.lib.init phases)) ++ [ (mkPipeline phases) ];
-      in
-        result;
 
-    # helper function to create ad-hoc dependency between two derivations
-    mkDependency = prev: next: next.overrideAttrs (oldAttrs: { prev = prev; });
+    /*
+     * Pipeline
+     */
 
-  };
-in
-  jobs
+    pipeline = mkPipelineList [
+      (
+        phase "build" [
+          build
+        ]
+      )
+      (
+        phase "test" [
+          #avdTest
+        ]
+      )
+      (
+        phase "release" [
+          tarball
+        ]
+      )
+    ];
 
+    pipelineJob = gatherPipelineOutput pipeline;
+
+  }

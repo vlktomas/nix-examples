@@ -42,7 +42,7 @@ let
     outputHashMode = "recursive";
     outputHashAlgo = "sha256";
     #outputHash = stdenv.lib.fakeSha256;
-    outputHash = "167ys1wi6w6cy24vkjl29c2w0cza4gkiyzjyzgp7gvhkdfmcxcba";
+    outputHash = "0sjm55xwpl98h2va0hpcklagyfkzq6bzicc88dvx4bhbf1acsrmy";
   };
 
 in
@@ -78,6 +78,7 @@ in
 
     passthru = {
       inherit deps;
+      executable = pname;
     };
 
     meta = with stdenv.lib; {
