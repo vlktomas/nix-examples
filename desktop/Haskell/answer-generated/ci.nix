@@ -83,8 +83,8 @@ in
       { nativeBuildInputs = [ build ]; }
       ''
         mkdir -p $out/tests/${build.pname}-test
-        echo "Answer to the Ultimate Question of Life,\n\
-          the Universe, and Everything: 42" > expected
+        printf "Answer to the Ultimate Question of Life,\n\
+            the Universe, and Everything: 42\n" > expected
         ${build.executable} > given
         diff expected given > $out/tests/${build.pname}-test/result
       ''
@@ -92,6 +92,7 @@ in
 
     nixosVmTest = nixosTest {
       machine = { ... }: {
+        nixpkgs.pkgs = pkgs;
         imports = [ ./module.nix ];
       };
       testScript = ''
@@ -105,9 +106,11 @@ in
 
     nixosVmContainerTest = nixosTest {
       machine = { ... }: {
+        nixpkgs.pkgs = pkgs;
         containers."${build.pname}" = {
           autoStart = true;
           config = { ... }: {
+            nixpkgs.pkgs = pkgs;
             imports = [ ./module.nix ];
           };
         };

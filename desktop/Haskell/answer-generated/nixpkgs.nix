@@ -17,11 +17,11 @@ in
         overlays = [
           (self: super:
           {
-            "${appPackageName}" = super.haskellPackages.callPackage ./app.nix { inherit localFiles; };
+            "${appPackageName}" = super.callPackage ./app.nix { inherit localFiles; };
           })
         ];
       };
       appPackage = pkgs."${appPackageName}";
-      appPackageName = "answer";
+      appPackageName = "answer-generated";
       outPath = "${nixpkgs}";
     }

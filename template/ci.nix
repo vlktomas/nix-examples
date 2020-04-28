@@ -101,6 +101,7 @@ in
 
     nixosVmTest = nixosTest {
       machine = { ... }: {
+        nixpkgs.pkgs = pkgs;
         imports = [ ./module.nix ];
       };
       testScript = ''
@@ -115,9 +116,11 @@ in
 
     nixosVmContainerTest = nixosTest {
       machine = { ... }: {
+        nixpkgs.pkgs = pkgs;
         containers."${build.pname}" = {
           autoStart = true;
           config = { ... }: {
+            nixpkgs.pkgs = pkgs;
             imports = [ ./module.nix ];
           };
         };
@@ -155,7 +158,7 @@ in
           echo "Hello, world!" > expected
           nixops ssh server -- ${build.executable} > given
           diff expected given > $out/result
-          nixops destroy -d ${deploymentName}
+          nixops destroy -d ${deploymentName} --confirm
           nixops delete -d ${deploymentName}
         ''
     ;
@@ -270,7 +273,7 @@ in
           scriptTest
           nixosVmTest
           nixosVmContainerTest
-          nixopsDeployTest
+          #nixopsDeployTest
         ]
       )
       (
@@ -289,4 +292,3 @@ in
     pipelineJob = gatherPipelineOutput pipeline;
 
   }
-

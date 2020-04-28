@@ -89,6 +89,7 @@ in
 
     nixosVmTest = nixosTest {
       machine = { ... }: {
+        nixpkgs.pkgs = pkgs;
         imports = [ ./module.nix ];
       };
       testScript = ''
@@ -102,9 +103,11 @@ in
 
     nixosVmContainerTest = nixosTest {
       machine = { ... }: {
+        nixpkgs.pkgs = pkgs;
         containers."${build.pname}" = {
           autoStart = true;
           config = { ... }: {
+            nixpkgs.pkgs = pkgs;
             imports = [ ./module.nix ];
           };
         };

@@ -21,7 +21,6 @@ mkDerivation rec {
       }
   );
 
-  # TODO passthru
   passthru = {
     executable = pname;
   };
@@ -31,7 +30,9 @@ mkDerivation rec {
   executableHaskellDepends = [ base protolude ];
   enableSharedExecutables = true;
 
+  description = "A program that prints answer to the ultimate question";
+  homepage = https://example.com/;
   license = stdenv.lib.licenses.bsd3;
-  # TODO meta
+  maintainers = [];
+  platforms = stdenv.lib.platforms.all;
 }
-

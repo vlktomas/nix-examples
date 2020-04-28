@@ -18,14 +18,29 @@ There is template for new example, which contains only these files with some add
 
 ## How to use
 
-Run all examples CI pipelines:
+Run all examples CI pipelines up to second phase (test phase):
 ```bash
-nix-build
+nix-build examples.nix -A examplesTests
 ```
 
 Build all examples:
 ```bash
 nix-build examples.nix -A examplesBuilds
+```
+
+Run all examples CI pipelines (memory intensive):
+```bash
+nix-build -A examplesPipelinesJobs
+```
+
+Run all examples CI pipelines up to second phase (numbered from zero):
+```bash
+nix-build -A examplesPipelinesZipped.1
+```
+
+Run all examples CI pipelines up to 'test' phase:
+```bash
+nix-build -E '(import ./default.nix).examplesPipelinePhase "test"'
 ```
 
 ### How to use each example 
@@ -59,6 +74,16 @@ nix-build ci.nix -A pipelineJob
 Run CI pipeline and create for each phase own `result` symlink:
 ```bash
 nix-build ci.nix -A pipeline
+```
+
+Run CI pipeline up to second phase (numbered from zero):
+```bash
+nix-build ci.nix -A pipeline.1
+```
+
+Run CI pipeline up to 'test' phase:
+```bash
+nix-build -E 'builtins.filter (phase: phase.name == "phase-test") (import ./ci.nix {}).pipeline'
 ```
 
 Run only some CI job:
@@ -140,7 +165,7 @@ Overview of available ways of getting dependencies in examples by dependency too
 |-------------     |:-----------------------:|:----------------------------------:|:------------------------------------:|
 | Autotools        | :heavy_check_mark:      | --                                 | --                                   |
 | Go modules       | --                      | --                                 | :heavy_check_mark:                   |
-| Cabal            | :heavy_check_mark:      | --                                 | --                                   |
+| Cabal            | :heavy_check_mark:      | :heavy_check_mark:                 | --                                   |
 | Ant              | --                      | --                                 | --                                   |
 | Maven            | --                      | --                                 | :heavy_check_mark:                   |
 | Gradle           | --                      | --                                 | :heavy_check_mark:                   |
@@ -362,8 +387,8 @@ Each machine configuration can be generated in different formats with `nix-commu
 
 Create deployment (existing NixOS installation or VirtualBox):
 ```bash
-nixops create ./cd.nix ./cd-nixos.nix -d example
-nixops create ./cd.nix ./cd-vbox.nix -d example-vbox
+nixops create ./cd-nixos.nix -d example
+nixops create ./cd-vbox.nix -d example-vbox
 ```
 
 Apply deployment:

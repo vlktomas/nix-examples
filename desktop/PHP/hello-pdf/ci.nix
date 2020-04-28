@@ -83,13 +83,14 @@ in
         mkdir -p $out/tests/${build.pname}-test
         echo "Hello, world!" > expected
         ${build.executable} > test.pdf
-        ${pdftotext} test.pdf test.txt
+        pdftotext test.pdf test.txt
         grep "hello world" test.txt
       ''
     ;
 
     nixosVmTest = nixosTest {
       machine = { ... }: {
+        nixpkgs.pkgs = pkgs;
         imports = [ ./module.nix ];
       };
       testScript = ''
@@ -103,9 +104,11 @@ in
 
     nixosVmContainerTest = nixosTest {
       machine = { ... }: {
+        nixpkgs.pkgs = pkgs;
         containers."${build.pname}" = {
           autoStart = true;
           config = { ... }: {
+            nixpkgs.pkgs = pkgs;
             imports = [ ./module.nix ];
           };
         };

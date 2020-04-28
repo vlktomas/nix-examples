@@ -1,6 +1,6 @@
 {
   # dependencies
-  stdenv, fetchurl, nix-gitignore, runCommand, haskell, haskellPackages,
+  stdenv, fetchurl, nix-gitignore, runCommand, git, haskell, haskellPackages,
 
   # args
   localFiles ? false
@@ -11,7 +11,7 @@ let
   url = "https://example.com";
   sha256 = stdenv.lib.fakeSha256;
 
-  cabal2nixOutput = runCommand "cabal2nix"
+  cabal2nixOutput = runCommand "run-cabal2nix"
     {
       src = (
         if localFiles then
@@ -21,13 +21,15 @@ let
             inherit url sha256;
           }
       );
-      nativeBuildInputs = [ haskellPackages.cabal2nix ];
+      nativeBuildInputs = [ haskellPackages.cabal2nix git ];
     }
     ''
+      cp -pr --reflink=auto -- "$src"/* .
+      git init
       cabal2nix . > $out
     '';
 
-  package = haskellPackages.callPackage cabal2nixOutput;
+  package = haskellPackages.callPackage (import "${cabal2nixOutput}") { };
 
 in
 
@@ -41,10 +43,13 @@ in
           inherit url sha256;
         }
     );
-    # TODO passthru
     passthru = {
       executable = "answer";
     };
-    # TODO meta
-  })
 
+    description = "A program that prints answer to the ultimate question";
+    homepage = https://example.com/;
+    license = stdenv.lib.licenses.bsd3;
+    maintainers = [];
+    platforms = stdenv.lib.platforms.all;
+  })

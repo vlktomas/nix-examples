@@ -8,7 +8,7 @@
 }:
 
 androidenv.buildApp {
-  name = "MyAndroidApp";
+  name = "myfirstapp";
 
   src = (
     if localFiles then

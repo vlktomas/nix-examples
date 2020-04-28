@@ -8,7 +8,7 @@
 
 buildGoModule rec {
 
-  name = "hello-${version}";
+  pname = "hello";
   version = "1.0";
 
   src = (

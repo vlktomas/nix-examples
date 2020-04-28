@@ -121,6 +121,7 @@ in
 
     nixosVmContainerTest = nixosTest {
       machine = { config, ... }: {
+        nixpkgs.pkgs = pkgs;
         containers = {
           webserver = {
             autoStart = true;
@@ -159,6 +160,7 @@ in
             };
           };
         };
+        networking.useDHCP = false;
         networking.bridges.br0.interfaces = [ ];
         networking.interfaces.br0.ipv4.addresses = [
             { address = "192.168.0.1"; prefixLength = 24; }
@@ -253,6 +255,7 @@ in
             };
           };
         };
+        networking.useDHCP = false;
         networking.bridges.br0.interfaces = [ ];
         networking.interfaces.br0.ipv4.addresses = [
             { address = "192.168.0.1"; prefixLength = 24; }
@@ -299,7 +302,7 @@ in
           # get webserver IP address
           WEBSERVER_IP=$(nixops info --deployment laravel-vbox --no-eval --plain | awk '{print $1 " " $(NF)}' | grep webserver | awk '{print $(NF)}')
           curl https://${WEBSERVER_IP}
-          nixops destroy -d ${deploymentName}
+          nixops destroy -d ${deploymentName} --confirm
           nixops delete -d ${deploymentName}
         ''
     ;
@@ -354,4 +357,3 @@ in
     pipelineJob = gatherPipelineOutput pipeline;
 
   }
-

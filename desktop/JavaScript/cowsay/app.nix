@@ -54,13 +54,16 @@ in
         }
     );
 
-  }).overrideAttrs (oldAttrs: {
+  }).overrideAttrs (oldAttrs: rec {
+
+    pname = "cowsay";
+    version = "1.4.0";
+    name = "${pname}-${version}";
 
     passthru = {
       tarball = app.tarball;
       shell = app.shell;
-      executable = "cowsay";
+      executable = pname;
     };
 
   })
-

@@ -3,7 +3,7 @@
 with lib;
 
 let
-  pkg = pkgs.answer;
+  pkg = pkgs.answer-generated;
 in
   {
     config = {

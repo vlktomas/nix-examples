@@ -81,14 +81,13 @@ in
       { nativeBuildInputs = [ build ]; }
       ''
         mkdir -p $out/tests/${build.pname}-test
-        echo "Hello, world!" > expected
-        ${build.executable} > given
-        diff expected given > $out/tests/${build.pname}-test/result
+        ${build.executable} | grep "Hello, world!"
       ''
     ;
 
     nixosVmTest = nixosTest {
       machine = { ... }: {
+        nixpkgs.pkgs = pkgs;
         imports = [ ./module.nix ];
       };
       testScript = ''
@@ -102,9 +101,11 @@ in
 
     nixosVmContainerTest = nixosTest {
       machine = { ... }: {
+        nixpkgs.pkgs = pkgs;
         containers."${build.pname}" = {
           autoStart = true;
           config = { ... }: {
+            nixpkgs.pkgs = pkgs;
             imports = [ ./module.nix ];
           };
         };
