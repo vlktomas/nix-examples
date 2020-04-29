@@ -6,12 +6,10 @@ let
   lib = nixpkgs.lib;
   appPackage = nixpkgs.appPackage;
 in
-  appPackage.overrideAttrs (oldAttrs: {
+  pkgs.mkShell {
+    inputsFrom = [ appPackage ];
     src = null;
-
-    shellHook =
-      ''
-        alias mvn='mvn -Dmaven.repo.local="${appPackage.deps}"'
-      '';
-  })
-
+    shellHook = ''
+      alias mvn='mvn -Dmaven.repo.local="${appPackage.deps}"'
+    '';
+  }

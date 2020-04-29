@@ -6,13 +6,11 @@ let
   lib = nixpkgs.lib;
   appPackage = nixpkgs.appPackage;
 in
-  appPackage.overrideAttrs (oldAttrs: {
+  pkgs.mkShell {
+    inputsFrom = [ appPackage ];
     src = null;
-
-    shellHook =
-      ''
-        [ ! -e vendor ] && ln -s ${appPackage.deps} vendor
-        trap "rm vendor" EXIT
-      '';
-  })
-
+    shellHook = ''
+      [ ! -e vendor ] && ln -s ${appPackage.deps} vendor
+      trap "rm vendor" EXIT
+    '';
+  }

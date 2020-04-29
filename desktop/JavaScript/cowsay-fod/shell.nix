@@ -6,14 +6,14 @@ let
   lib = nixpkgs.lib;
   appPackage = nixpkgs.appPackage;
 in
-  appPackage.overrideAttrs (oldAttrs: {
+  pkgs.mkShell {
+    inputsFrom = [ appPackage ];
     src = null;
 
     # FIXME we must copy node_modules dir
-    shellHook =
-      ''
-        [ ! -e node_modules ] && mkdir node_modules && cp -R ${appPackage.deps}/* node_modules
-        chmod -R u+w node_modules
-        trap "rm -rf node_modules" EXIT
-      '';
-  })
+    shellHook = ''
+      [ ! -e node_modules ] && mkdir node_modules && cp -R ${appPackage.deps}/* node_modules
+      chmod -R u+w node_modules
+      trap "rm -rf node_modules" EXIT
+    '';
+  }

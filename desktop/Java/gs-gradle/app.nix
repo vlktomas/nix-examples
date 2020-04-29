@@ -27,28 +27,26 @@ let
         }
     );
 
-    buildPhase =
-      ''
-        export GRADLE_USER_HOME=$(mktemp -d);
-        # add task to download dependencies to build.gradle
-        cat <<- EOM >> build.gradle
+    buildPhase = ''
+      export GRADLE_USER_HOME=$(mktemp -d);
+      # add task to download dependencies to build.gradle
+      cat <<- EOM >> build.gradle
 
-        task downloadDependencies(type: Exec) {
-            configurations.testRuntime.files
-            commandLine 'echo', 'Downloaded all dependencies'
-        }
-        EOM
-        gradle --no-daemon downloadDependencies
-      '';
+      task downloadDependencies(type: Exec) {
+          configurations.testRuntime.files
+          commandLine 'echo', 'Downloaded all dependencies'
+      }
+      EOM
+      gradle --no-daemon downloadDependencies
+    '';
 
     # Mavenize dependency paths
     # e.g. org.codehaus.groovy/groovy/2.4.0/{hash}/groovy-2.4.0.jar -> org/codehaus/groovy/groovy/2.4.0/groovy-2.4.0.jar
-    installPhase =
-      ''
-        find $GRADLE_USER_HOME/caches/modules-2 -type f -regex '.*\.\(jar\|pom\)' \
-          | perl -pe 's#(.*/([^/]+)/([^/]+)/([^/]+)/[0-9a-f]{30,40}/([^/\s]+))$# ($x = $2) =~ tr|\.|/|; "install -Dm444 $1 \$out/$x/$3/$4/$5" #e' \
-          | sh
-      '';
+    installPhase = ''
+      find $GRADLE_USER_HOME/caches/modules-2 -type f -regex '.*\.\(jar\|pom\)' \
+        | perl -pe 's#(.*/([^/]+)/([^/]+)/([^/]+)/[0-9a-f]{30,40}/([^/\s]+))$# ($x = $2) =~ tr|\.|/|; "install -Dm444 $1 \$out/$x/$3/$4/$5" #e' \
+        | sh
+    '';
 
     outputHashMode = "recursive";
     outputHashAlgo = "sha256";
@@ -92,20 +90,18 @@ in
         }
     );
 
-    buildPhase =
-      ''
-        export GRADLE_USER_HOME=$(mktemp -d)
-        # point to local deps repo
-        gradle --offline --no-daemon --info --init-script ${gradleInit} jar
-      '';
+    buildPhase = ''
+      export GRADLE_USER_HOME=$(mktemp -d)
+      # point to local deps repo
+      gradle --offline --no-daemon --info --init-script ${gradleInit} jar
+    '';
 
-    installPhase =
-      ''
-        mkdir -p $out/share/java
-        cp build/libs/${pname}-${version}.jar $out/share/java/${pname}-${version}.jar
-        mkdir -p $out/bin
-        makeWrapper ${jre}/bin/java $out/bin/${pname} --add-flags "-jar $out/share/java/${pname}-${version}.jar"
-      '';
+    installPhase = ''
+      mkdir -p $out/share/java
+      cp build/libs/${pname}-${version}.jar $out/share/java/${pname}-${version}.jar
+      mkdir -p $out/bin
+      makeWrapper ${jre}/bin/java $out/bin/${pname} --add-flags "-jar $out/share/java/${pname}-${version}.jar"
+    '';
 
     passthru = {
       inherit deps;

@@ -30,17 +30,16 @@ let
         }
     );
 
-    installPhase =
-      ''
-        mvn dependency:go-offline -Dmaven.repo.local="$out"
-        # download surefire-junit-platform which is not explicitly defined as dependency
-        mvn dependency:get -Dmaven.repo.local="$out" -Dartifact=org.apache.maven.surefire:surefire-junit-platform:2.22.2
-      '';
+    installPhase = ''
+      mvn dependency:go-offline -Dmaven.repo.local="$out"
+      # download surefire-junit-platform which is not explicitly defined as dependency
+      mvn dependency:get -Dmaven.repo.local="$out" -Dartifact=org.apache.maven.surefire:surefire-junit-platform:2.22.2
+    '';
 
     outputHashMode = "recursive";
     outputHashAlgo = "sha256";
     #outputHash = stdenv.lib.fakeSha256;
-    outputHash = "1z5d722irza6skqhjsv2dlbckw7j552c92yy9p2vv4p3dbjs2bcc";
+    outputHash = "0r8346mgai7k6i4pk612zp2sna9fakdaqbj8kla31ajrxvkvbfk2";
   };
 in
   stdenv.mkDerivation rec {
@@ -58,23 +57,21 @@ in
         }
     );
 
-    # TODO update example to spring boot 2.2.3 or 2.2:4 or 2.2.5 where maven-jar-plugin is updated to 3.2.0 and check that jar contains files with right timestamps
-    buildPhase =
-      ''
-        # property project.build.outputTimestamp is supported in maven-jar-plugin as of 3.2.0,
-        # in older versions produced JAR contains timestamps and therefore is not reproducible
-        # morover we must update timestamp of pom.xml, because jre cannot load jar files where the modified day or month is 0
-        touch pom.xml
-        mvn package -Dmaven.repo.local="${deps}" -Dproject.build.outputTimestamp=1970-01-01T00:00:00Z
-      '';
+    # TODO update example to spring boot 2.3.0 where maven-jar-plugin is updated to 3.2.0 and check that jar contains files with right timestamps (jar tvf package.jar)
+    buildPhase = ''
+      # property project.build.outputTimestamp is supported in maven-jar-plugin as of 3.2.0,
+      # in older versions produced JAR contains timestamps and therefore is not reproducible
+      # morover we must update timestamp of pom.xml, because jre cannot load jar files where the modified day or month is 0
+      touch pom.xml
+      mvn package -Dmaven.repo.local="${deps}" -Dproject.build.outputTimestamp=1970-01-01T00:00:00Z
+    '';
 
-    installPhase =
-      ''
-        mkdir -p $out/share/java
-        cp target/demo-0.0.1-SNAPSHOT.jar $out/share/java/demo-0.0.1-SNAPSHOT.jar
-        mkdir -p $out/bin
-        makeWrapper ${adoptopenjdk-jre-hotspot-bin-11}/bin/java $out/bin/${pname} --add-flags "-jar $out/share/java/demo-0.0.1-SNAPSHOT.jar"
-      '';
+    installPhase = ''
+      mkdir -p $out/share/java
+      cp target/demo-0.0.1-SNAPSHOT.jar $out/share/java/demo-0.0.1-SNAPSHOT.jar
+      mkdir -p $out/bin
+      makeWrapper ${adoptopenjdk-jre-hotspot-bin-11}/bin/java $out/bin/${pname} --add-flags "-jar $out/share/java/demo-0.0.1-SNAPSHOT.jar"
+    '';
 
     passthru = {
       inherit deps;

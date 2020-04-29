@@ -56,7 +56,7 @@ in
 
       imports = [ deploymentNodes.fileserver ];
 
-      deployment.targetHost = "1.2.3.4";
+      deployment.targetHost = "1.2.3.5";
     };
 
   } // lib.optionalAttrs (!databaseLocally) {
@@ -80,7 +80,7 @@ in
         wants = [ "initial-script-key.service" ];
       };
 
-      deployment.targetHost = "1.2.3.4";
+      deployment.targetHost = "1.2.3.6";
     };
 
   }

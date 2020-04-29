@@ -6,4 +6,4 @@ let
   lib = nixpkgs.lib;
   appPackage = nixpkgs.appPackage;
 in
-  (appPackage.overrideAttrs (oldAttrs: {})).shell
+  appPackage.shell

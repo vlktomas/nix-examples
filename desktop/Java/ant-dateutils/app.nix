@@ -25,13 +25,12 @@ stdenv.mkDerivation rec {
 
   buildPhase = "ant";
 
-  installPhase =
-    ''
-      mkdir -p $out/bin
-      mkdir -p $out/share/java
-      cp dist/* $out/share/java/
-      makeWrapper ${jre}/bin/java $out/bin/${pname} --add-flags "-jar $out/share/java/DateUtils.jar"
-    '';
+  installPhase = ''
+    mkdir -p $out/bin
+    mkdir -p $out/share/java
+    cp dist/* $out/share/java/
+    makeWrapper ${jre}/bin/java $out/bin/${pname} --add-flags "-jar $out/share/java/DateUtils.jar"
+  '';
 
   passthru = {
     executable = pname;

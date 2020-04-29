@@ -45,13 +45,11 @@ let
         }
     );
 
-    buildPhase =
-    ''
+    buildPhase = ''
       composer install --no-autoloader
     '';
 
-    installPhase =
-    ''
+    installPhase = ''
       mkdir -p $out
       cp -R vendor/* $out
     '';
@@ -172,48 +170,45 @@ in
     );
 
     # FIXME for laravel we must copy vendor dir and run composer dump-autoload
-    configurePhase =
-      ''
-        #ln -s ${deps} vendor
-        mkdir vendor
-        cp -R ${deps}/* vendor
-        chmod -R u+w vendor/composer
-        ln -s ${nodePackage}/lib/node_modules/laravel-node-dependencies/node_modules node_modules
-      '';
+    configurePhase = ''
+      #ln -s ${deps} vendor
+      mkdir vendor
+      cp -R ${deps}/* vendor
+      chmod -R u+w vendor/composer
+      ln -s ${nodePackage}/lib/node_modules/laravel-node-dependencies/node_modules node_modules
+    '';
 
-    buildPhase =
-      ''
-        # create temp storage in order to use composer dump-autoload command
-        export TEMP=$(mktemp -d)
-        mkdir -p $TEMP/app
-        mkdir -p $TEMP/framework/sessions $TEMP/framework/views $TEMP/framework/cache
-        mkdir -p $TEMP/logs
-        cp .env.example .env
-        sed -i "s:APP_STORAGE_PATH=.*:APP_STORAGE_PATH=$TEMP:" .env
-        composer dump-autoload --optimize
-        rm .env
-        ln -s ${envFile} .env
-        #php artisan key:generate
-        #sed -i "s:APP_KEY=.*:APP_KEY=${toString appKey}:" .env
-        #sed -i "s:APP_STORAGE_PATH=.*:APP_STORAGE_PATH=${toString appStoragePath}:" .env
-        #sed -i "s:DB_HOST=.*:DB_HOST=${toString dbHost}:" .env
-        #sed -i "s:DB_PORT=.*:DB_PORT=${toString dbPort}:" .env
-        #sed -i "s:DB_SOCKET=.*:DB_SOCKET=${toString dbSocket}:" .env
-        #sed -i "s:DB_DATABASE=.*:DB_DATABASE=${toString dbName}:" .env
-        #sed -i "s:DB_USERNAME=.*:DB_USERNAME=${toString dbUsername}:" .env
-        #sed -i "s:DB_PASSWORD=.*:DB_PASSWORD=${toString dbPassword}:" .env
-        #npm run prod
-        export NODE_ENV=production
-        node node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js
-      '';
+    buildPhase = ''
+      # create temp storage in order to use composer dump-autoload command
+      export TEMP=$(mktemp -d)
+      mkdir -p $TEMP/app
+      mkdir -p $TEMP/framework/sessions $TEMP/framework/views $TEMP/framework/cache
+      mkdir -p $TEMP/logs
+      cp .env.example .env
+      sed -i "s:APP_STORAGE_PATH=.*:APP_STORAGE_PATH=$TEMP:" .env
+      composer dump-autoload --optimize
+      rm .env
+      ln -s ${envFile} .env
+      #php artisan key:generate
+      #sed -i "s:APP_KEY=.*:APP_KEY=${toString appKey}:" .env
+      #sed -i "s:APP_STORAGE_PATH=.*:APP_STORAGE_PATH=${toString appStoragePath}:" .env
+      #sed -i "s:DB_HOST=.*:DB_HOST=${toString dbHost}:" .env
+      #sed -i "s:DB_PORT=.*:DB_PORT=${toString dbPort}:" .env
+      #sed -i "s:DB_SOCKET=.*:DB_SOCKET=${toString dbSocket}:" .env
+      #sed -i "s:DB_DATABASE=.*:DB_DATABASE=${toString dbName}:" .env
+      #sed -i "s:DB_USERNAME=.*:DB_USERNAME=${toString dbUsername}:" .env
+      #sed -i "s:DB_PASSWORD=.*:DB_PASSWORD=${toString dbPassword}:" .env
+      #npm run prod
+      export NODE_ENV=production
+      node node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js
+    '';
 
-    installPhase =
-      ''
-        mkdir -p $out/share/php/${pname}
-        cp -R . $out/share/php/${pname}
-        mkdir -p $out/bin
-        makeWrapper ${php}/bin/php $out/bin/${pname} --add-flags "$out/share/php/${pname}/artisan"
-      '';
+    installPhase = ''
+      mkdir -p $out/share/php/${pname}
+      cp -R . $out/share/php/${pname}
+      mkdir -p $out/bin
+      makeWrapper ${php}/bin/php $out/bin/${pname} --add-flags "$out/share/php/${pname}/artisan"
+    '';
 
     passthru = {
       phpDeps = deps;

@@ -7,7 +7,8 @@ let
   lib = nixpkgs.lib;
   appPackageName = nixpkgs.appPackageName;
 
-  mkPipeline = phases: lib.foldl mkDependency null phases;
+  mkPipeline = mkPipeline' null;
+  mkPipeline' = prev: phases: lib.foldl mkDependency prev phases;
 
   mkPipelineList =
     let

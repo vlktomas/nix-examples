@@ -7,7 +7,8 @@ let
   lib = nixpkgs.lib;
   appPackageName = nixpkgs.appPackageName;
 
-  mkPipeline = phases: lib.foldl mkDependency null phases;
+  mkPipeline = mkPipeline' null;
+  mkPipeline' = prev: phases: lib.foldl mkDependency prev phases;
 
   mkPipelineList =
     let
@@ -50,34 +51,11 @@ in
 
     build = pkgs."${appPackageName}";
 
-    buildLinux64 = pkgsCross.gnu64."${appPackageName}";
-
-    buildLinux32 = pkgsCross.gnu32."${appPackageName}";
-
-    buildWindows32 = pkgsCross.mingwW64."${appPackageName}";
-
-    buildWindows64 = pkgsCross.mingw32."${appPackageName}";
-
-    buildRaspberryPi = pkgsCross.raspberryPi."${appPackageName}";
-
-    buildAndroidAarch64 = pkgsCross.aarch64-android-prebuilt."${appPackageName}";
-
-    buildAndroidArmv7a = pkgsCross.armv7a-android-prebuilt."${appPackageName}";
-
-    buildRiscv64 = pkgsCross.riscv64."${appPackageName}";
-
-    buildRiscv32 = pkgsCross.riscv32."${appPackageName}";
-
-    buildAarch64 = pkgsCross.aarch64-multiplatform."${appPackageName}";
-
-    buildAvr = pkgsCross.avr."${appPackageName}";
-
 
     /*
      * Test
      */
 
-    # TODO
     scriptTest = runCommand "${build.pname}-test"
       { nativeBuildInputs = [ build ]; }
       ''

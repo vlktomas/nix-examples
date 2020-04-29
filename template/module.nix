@@ -27,7 +27,7 @@ in
     config = mkIf cfg.enable {
 
       systemd.services.example = {
-        description = "Run example program";
+        description = "Example service";
         wantedBy = [ "multi-user.target" ];
         path = [ pkg ];
         script = ''

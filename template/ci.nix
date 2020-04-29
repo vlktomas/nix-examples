@@ -8,7 +8,8 @@ let
   appPackageName = nixpkgs.appPackageName;
 
   # if dependencies between the phases are not implicit, these can be explicitly created
-  mkPipeline = phases: lib.foldl mkDependency null phases;
+  mkPipeline = mkPipeline' null;
+  mkPipeline' = prev: phases: lib.foldl mkDependency prev phases;
 
   # function mkPipeline is sufficient for executing phases in pipeline,
   # but pipeline in form of list is better for further manipulation
@@ -27,7 +28,7 @@ let
 
   # phase as derivation, which symlinks all jobs outputs into single directory
   phase = phaseName: jobs: pkgs.symlinkJoin {
-    name = "${phaseName}-phase";
+    name = "phase-${phaseName}";
     paths = [ jobs ];
     postBuild = ''
       echo -e "\033[0;32m<<< completed ${phaseName} phase >>>\033[0m"

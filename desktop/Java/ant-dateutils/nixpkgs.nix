@@ -15,8 +15,7 @@ in
       pkgs = import nixpkgs {
         config = { };
         overlays = [
-          (self: super:
-          {
+          (self: super: {
             "${appPackageName}" = super.callPackage ./app.nix { inherit localFiles; };
           })
         ];

@@ -74,11 +74,10 @@ stdenv.mkDerivation rec {
   # specify configurePhase, buildPhase, ...
 
   # specify output of derivation
-  installPhase =
-    ''
-      mkdir -p $out/bin
-      # copy binary to $out/bin
-    '';
+  installPhase = ''
+    mkdir -p $out/bin
+    # copy binary to $out/bin
+  '';
 
   # provide some package attributes, for example executable name
   passthru = {

@@ -2,7 +2,7 @@
 
 # this file is very similar to default.nix
 
-# if you do not want use this file, you can also use pkgs.lib.inNixShell
+# if you do not want use this file, you can also use lib.inNixShell
 # in app.nix and specify some derivation attributtes conditionally
 
 let
@@ -16,17 +16,18 @@ in
     src = null;
     # we can add some developement only tools as dependency
     buildInputs = with pkgs; [ cowsay ];
+    shellHook = ''
+      export ANSWER="42"
+    '';
   }
-  # but in expression above we can't specify shellHook,
-  # so to specify also shellHook use this:
+  # or
   /*
   example.overrideAttrs (oldAttrs: {
     src = null;
     # we can add some developement only tools as dependency
     nativeBuildInputs = oldAttrs.nativeBuildInputs ++ [ cowsay ];
-    shellHook =
-      ''
-        export ANSWER="42"
-      '';
+    shellHook = ''
+      export ANSWER="42"
+    '';
   })
   */

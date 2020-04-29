@@ -33,6 +33,7 @@ buildGoModule rec {
     description = "Hello world example in Go";
     homepage = https://blog.golang.org/using-go-modules;
     license = licenses.asl20;
+    maintainers = [];
     platforms = platforms.all;
   };
 }

@@ -16,18 +16,8 @@ let
       config = node;
     };
 
-  deploymentContainers = builtins.mapAttrs
-    (name: value:
-      nodeToContainer value {
-        autoStart = true;
-        privateNetwork = true;
-        hostAddress = "192.168.100.10";
-        localAddress = "192.168.100.11";
-      }
-    )
-    deploymentNodes;
-
-  mkPipeline = phases: lib.foldl mkDependency null phases;
+  mkPipeline = mkPipeline' null;
+  mkPipeline' = prev: phases: lib.foldl mkDependency prev phases;
 
   mkPipelineList =
     let
@@ -286,7 +276,6 @@ in
       in
         runCommand "${build.pname}-deploy-test"
         {
-          # test-only dependencies
           buildInputs = [ nixops cacert nix ];
           src = build.src;
           NIX_PATH = "nixpkgs=${nixpkgs}";

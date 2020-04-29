@@ -17,8 +17,7 @@ in
           android_sdk.accept_license = true;
         };
         overlays = [
-          (self: super:
-          {
+          (self: super: {
             "${appPackageName}" = super.callPackage ./app.nix { inherit localFiles; };
           })
         ];

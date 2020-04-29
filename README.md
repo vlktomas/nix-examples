@@ -144,7 +144,7 @@ Run CI pipeline and deploy with NixOps
         - Ant -- myfirstapp -- https://github.com/svanderburg/nix-androidenvtests
 
 - multitier
-    - TODO
+    - Python -- XmlRpc -- https://wiki.python.org/moin/XmlRpc
 
 - web
     - Laravel
@@ -166,11 +166,11 @@ Overview of available ways of getting dependencies in examples by dependency too
 | Autotools        | :heavy_check_mark:      | --                                 | --                                   |
 | Go modules       | --                      | --                                 | :heavy_check_mark:                   |
 | Cabal            | :heavy_check_mark:      | :heavy_check_mark:                 | --                                   |
-| Ant              | --                      | --                                 | --                                   |
 | Maven            | --                      | --                                 | :heavy_check_mark:                   |
 | Gradle           | --                      | --                                 | :heavy_check_mark:                   |
 | NPM              | --                      | :heavy_check_mark:                 | :heavy_check_mark:                   |
 | Composer         | --                      | --                                 | :heavy_check_mark:                   |
+| Pip              | :heavy_check_mark:      | --                                 | --                                   |
 
 ## Notes
 
@@ -305,10 +305,9 @@ nix-env -f default.nix -i
 
 Overlays for Nixpkgs can be defined in `~/.config/nixpkgs/overlays`:
 ```nix
-self: super:
-  {
-    my-app = super.callPackage ./pkgs/my-app { };
-  }
+self: super: {
+  my-app = super.callPackage ./pkgs/my-app { };
+}
 ```
 
 Export closure:

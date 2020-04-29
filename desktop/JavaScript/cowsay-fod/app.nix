@@ -28,16 +28,14 @@ let
         }
     );
 
-    buildPhase =
-      ''
-        npm install
-      '';
+    buildPhase = ''
+      npm install
+    '';
 
-    installPhase =
-      ''
-        mkdir -p $out
-        cp -R node_modules/* $out
-      '';
+    installPhase = ''
+      mkdir -p $out
+      cp -R node_modules/* $out
+    '';
 
     outputHashMode = "recursive";
     outputHashAlgo = "sha256";

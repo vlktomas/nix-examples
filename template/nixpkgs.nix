@@ -32,8 +32,7 @@ in
 
         # we can specify multiple overlays for adding/modifying packages
         overlays = [
-          (self: super:
-          {
+          (self: super: {
             # add this app to pkgs
             "${appPackageName}" = super.callPackage ./app.nix { inherit localFiles; };
           })

@@ -36,13 +36,11 @@ let
         }
     );
 
-    buildPhase =
-    ''
+    buildPhase = ''
       composer install --no-autoloader
     '';
 
-    installPhase =
-    ''
+    installPhase = ''
       mkdir -p $out
       cp -R vendor/* $out
     '';
@@ -73,26 +71,23 @@ in
     );
 
     # FIXME for laravel we must copy vendor dir and run composer dump-autoload
-    configurePhase =
-      ''
-        #ln -s ${deps} vendor
-        mkdir vendor
-        cp -R ${deps}/* vendor
-        chmod -R u+w vendor/composer
-      '';
+    configurePhase = ''
+      #ln -s ${deps} vendor
+      mkdir vendor
+      cp -R ${deps}/* vendor
+      chmod -R u+w vendor/composer
+    '';
 
-    buildPhase =
-      ''
-        composer dump-autoload --optimize
-      '';
+    buildPhase = ''
+      composer dump-autoload --optimize
+    '';
 
-    installPhase =
-      ''
-        mkdir -p $out/share/php/${pname}
-        cp -R . $out/share/php/${pname}
-        mkdir -p $out/bin
-        makeWrapper ${php}/bin/php $out/bin/${pname} --add-flags "$out/share/php/${pname}/artisan"
-      '';
+    installPhase = ''
+      mkdir -p $out/share/php/${pname}
+      cp -R . $out/share/php/${pname}
+      mkdir -p $out/bin
+      makeWrapper ${php}/bin/php $out/bin/${pname} --add-flags "$out/share/php/${pname}/artisan"
+    '';
 
     passthru = {
       inherit deps;

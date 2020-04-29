@@ -7,7 +7,7 @@ let
   sha256 = "0ssi1wpaf7plaswqqjwigppsg5fyh99vdlb9kzl7c9lng89ndq1i"; # bad hash
 
   mavenJdk11 = maven.overrideAttrs (oldAttrs: {
-    jdk = jdk11; 
+    jdk = jdk11;
   });
 
   mavenJdk11Wrapped = runCommand "maven-wrapped" {
@@ -55,12 +55,11 @@ let
     configurePhase =
       makeMvnSettingsCommand "$out";
 
-    installPhase =
-      ''
-        mvn dependency:go-offline
-        # download surefire-junit-platform which is not explicitly defined as dependency
-        mvn dependency:get -Dartifact=org.apache.maven.surefire:surefire-junit-platform:2.22.2
-      '';
+    installPhase = ''
+      mvn dependency:go-offline
+      # download surefire-junit-platform which is not explicitly defined as dependency
+      mvn dependency:get -Dartifact=org.apache.maven.surefire:surefire-junit-platform:2.22.2
+    '';
 
     outputHashMode = "recursive";
     outputHashAlgo = "sha256";
@@ -86,23 +85,21 @@ in
     configurePhase =
       makeMvnSettingsCommand mvnDependencyGoOfflineOutput;
 
-    # TODO update example to spring boot 2.2.3 or 2.2:4 or 2.2.5 where maven-jar-plugin is updated to 3.2.0 and check that jar contains files with right timestamps
-    buildPhase =
-      ''
-        # property project.build.outputTimestamp is supported in maven-jar-plugin as of 3.2.0, 
-        # in older versions produced JAR contains timestamps and therefore is not reproducible
-        # morover we must update timestamp of pom.xml, because jre cannot load jar files where the modified day or month is 0
-        touch pom.xml
-        mvn package -Dproject.build.outputTimestamp=1970-01-01T00:00:00Z
-      '';
+    # TODO update example to spring boot 2.3.0 where maven-jar-plugin is updated to 3.2.0 and check that jar contains files with right timestamps (jar tvf package.jar)
+    buildPhase = ''
+      # property project.build.outputTimestamp is supported in maven-jar-plugin as of 3.2.0,
+      # in older versions produced JAR contains timestamps and therefore is not reproducible
+      # morover we must update timestamp of pom.xml, because jre cannot load jar files where the modified day or month is 0
+      touch pom.xml
+      mvn package -Dproject.build.outputTimestamp=1970-01-01T00:00:00Z
+    '';
 
-    installPhase =
-      ''
-        mkdir -p $out/share/java
-        cp target/demo-0.0.1-SNAPSHOT.jar $out/share/java/demo-0.0.1-SNAPSHOT.jar
-        mkdir -p $out/bin
-        makeWrapper ${adoptopenjdk-jre-hotspot-bin-11}/bin/java $out/bin/spring-boot --add-flags "-jar $out/share/java/demo-0.0.1-SNAPSHOT.jar"
-      '';
+    installPhase = ''
+      mkdir -p $out/share/java
+      cp target/demo-0.0.1-SNAPSHOT.jar $out/share/java/demo-0.0.1-SNAPSHOT.jar
+      mkdir -p $out/bin
+      makeWrapper ${adoptopenjdk-jre-hotspot-bin-11}/bin/java $out/bin/spring-boot --add-flags "-jar $out/share/java/demo-0.0.1-SNAPSHOT.jar"
+    '';
 
     passthru = {
       m2 = mvnDependencyGoOfflineOutput;

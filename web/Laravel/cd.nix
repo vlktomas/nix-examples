@@ -53,7 +53,7 @@ in
 
       # when building a VM, filesystems options are overriden and NFS
       # filesystem will not be mounted, so we must use 'mkVMOverride'
-      fileSystems = pkgs.lib.mkVMOverride {
+      fileSystems = lib.mkVMOverride {
         "/mnt/data" = {
           fsType = "nfs";
           device = "fileserver:/";

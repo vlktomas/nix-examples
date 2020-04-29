@@ -15,7 +15,8 @@ let
 
   goPath = extraSrcs;
 in
-  appPackage.overrideAttrs (oldAttrs: {
+  pkgs.mkShell {
+    inputsFrom = [ appPackage ];
     src = null;
 
     # restore shellHook from older version of buildGoModule
@@ -28,4 +29,4 @@ in
     ) goPath) + ''
       export GOPATH=${lib.concatStringsSep ":" ( ["$d"] ++ ["$GOPATH"] ++ ["$PWD"] ++ extraSrcPaths)}
     '';
-  })
+  }

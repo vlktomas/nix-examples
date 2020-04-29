@@ -26,11 +26,11 @@ rec {
     # TODO
 
     # mobile
-    mobileAndroidCardView = import ./mobile/Android/cardview/ci.nix {};
+    mobileAndroidCardview = import ./mobile/Android/cardview/ci.nix {};
     mobileAndroidMyfirstapp = import ./mobile/Android/myfirstapp/ci.nix {};
 
     # multitier
-    # TODO
+    multitierPythonHelloanswer = import ./multitier/Python/helloanswer/ci.nix {};
 
     # web
     # FIXME not always reproducible

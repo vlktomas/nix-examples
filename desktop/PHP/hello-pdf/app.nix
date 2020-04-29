@@ -28,16 +28,14 @@ let
         }
     );
 
-    buildPhase =
-      ''
-        composer install
-      '';
+    buildPhase = ''
+      composer install
+    '';
 
-    installPhase =
-      ''
-        mkdir -p $out
-        cp -R vendor/* $out
-      '';
+    installPhase = ''
+      mkdir -p $out
+      cp -R vendor/* $out
+    '';
 
     outputHashMode = "recursive";
     outputHashAlgo = "sha256";
@@ -63,18 +61,16 @@ in
         }
     );
 
-    configurePhase =
-      ''
-        ln -s ${deps} vendor
-      '';
+    configurePhase = ''
+      ln -s ${deps} vendor
+    '';
 
-    installPhase =
-      ''
-        mkdir -p $out/share/php/${pname}
-        cp -R . $out/share/php/${pname}
-        mkdir -p $out/bin
-        makeWrapper ${php}/bin/php $out/bin/${pname} --add-flags "$out/share/php/${pname}/index.php"
-      '';
+    installPhase = ''
+      mkdir -p $out/share/php/${pname}
+      cp -R . $out/share/php/${pname}
+      mkdir -p $out/bin
+      makeWrapper ${php}/bin/php $out/bin/${pname} --add-flags "$out/share/php/${pname}/index.php"
+    '';
 
     passthru = {
       inherit deps;
