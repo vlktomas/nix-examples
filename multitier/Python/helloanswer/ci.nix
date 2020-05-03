@@ -15,11 +15,6 @@ let
     inherit nixpkgsSource localFiles; clientLocally = false;
   };
 
-  nodeToContainer = node: containerOpts:
-    containerOpts // {
-      config = node;
-    };
-
   mkPipeline = mkPipeline' null;
   mkPipeline' = prev: phases: lib.foldl mkDependency prev phases;
 

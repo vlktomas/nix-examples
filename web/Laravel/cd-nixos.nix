@@ -17,7 +17,7 @@ let
 in
   {
 
-    network.description = "Laravel VirtualBox";
+    network.description = "Laravel deployed to NixOS";
 
     webserver = {
 

@@ -7,7 +7,7 @@
 }:
 
 let
-  pname = "spring-boot";
+  pname = "pi";
   version = "1.0";
   url = "https://example.com";
   sha256 = stdenv.lib.fakeSha256;
@@ -30,18 +30,15 @@ let
         }
     );
 
-    # TODO if right version of maven-dependency-plugin is used, then surefire explicit download is not needed
     installPhase = ''
       mkdir -p $out
       mvn dependency:go-offline -Dmaven.repo.local="$out" --update-snapshots
-      # download surefire-junit-platform which is not explicitly defined as dependency
-      mvn dependency:get -Dmaven.repo.local="$out" -Dartifact=org.apache.maven.surefire:surefire-junit-platform:2.22.2
     '';
 
     outputHashMode = "recursive";
     outputHashAlgo = "sha256";
     #outputHash = stdenv.lib.fakeSha256;
-    outputHash = "0r8346mgai7k6i4pk612zp2sna9fakdaqbj8kla31ajrxvkvbfk2";
+    outputHash = "0dk96374ls9jrw9dp85k4nq87nrnq2wvx20rn81ihxglg957hpig";
   };
 in
   stdenv.mkDerivation rec {
@@ -59,7 +56,6 @@ in
         }
     );
 
-    # TODO update example to spring boot 2.3.0 where maven-jar-plugin is updated to 3.2.0 and check that jar contains files with right timestamps (jar tvf package.jar)
     buildPhase = ''
       # property project.build.outputTimestamp is supported in maven-jar-plugin as of 3.2.0,
       # in older versions produced JAR contains timestamps and therefore is not reproducible
@@ -70,20 +66,17 @@ in
 
     installPhase = ''
       mkdir -p $out/share/java
-      cp target/demo-0.0.1-SNAPSHOT.jar $out/share/java/demo-0.0.1-SNAPSHOT.jar
-      mkdir -p $out/bin
-      makeWrapper ${adoptopenjdk-jre-hotspot-bin-11}/bin/java $out/bin/${pname} --add-flags "-jar $out/share/java/demo-0.0.1-SNAPSHOT.jar"
+      cp target/pi-1.0.jar $out/share/java/pi-1.0.jar
     '';
 
     passthru = {
       inherit deps;
-      executable = pname;
     };
 
     meta = with stdenv.lib; {
-      description = "Java Maven example";
+      description = "Spark Pi example";
       longDescription = ''
-        The spring-boot program which demonstrate building Java project with Maven
+        Simple Spark example, which computes Pi estimation.
       '';
       homepage = https://example.com/;
       license = licenses.gpl3Plus;
@@ -91,4 +84,3 @@ in
       platforms = platforms.all;
     };
   }
-

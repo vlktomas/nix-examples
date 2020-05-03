@@ -29,9 +29,7 @@ in
         wants = [ "some-secret-key.service" ];
       };
 
-      server = {
-        deployment.targetHost = "1.2.3.4";
-      };
+      deployment.targetHost = "1.2.3.4";
     };
 
   }

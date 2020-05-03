@@ -41,7 +41,7 @@ stdenv.mkDerivation rec {
     longDescription = ''
       The date-utils program which demonstrate building Java project with Ant
     '';
-    homepage = https://exmple.com/;
+    homepage = https://example.com/;
     license = licenses.gpl3Plus;
     maintainers = [];
     platforms = platforms.all;

@@ -18,14 +18,9 @@ There is template for new example, which contains only these files with some add
 
 ## How to use
 
-Run all examples CI pipelines up to second phase (test phase):
-```bash
-nix-build examples.nix -A examplesTests
-```
-
 Build all examples:
 ```bash
-nix-build examples.nix -A examplesBuilds
+nix-build -A examplesBuilds
 ```
 
 Run all examples CI pipelines (memory intensive):
@@ -106,51 +101,6 @@ Run CI pipeline and deploy with NixOps
 ./cicd.sh
 ```
 
-## List of example projects and its sources
-
-- desktop
-    - C:
-        - Autoools -- GNU hello -- https://www.gnu.org/software/hello/
-    - C#:
-        - TODO
-    - C++:
-        - Autoools -- TODO
-    - Go:
-        - Go Modules -- hello -- https://github.com/golang/go/wiki/Modules
-    - Haskell:
-        - Cabal -- answer -- https://github.com/shajra/example-nix
-        - Cabal -- answer-generated -- https://github.com/shajra/example-nix
-    - Java:
-        - Ant -- AntDateUtils -- https://www.mkyong.com/ant/ant-how-to-create-a-java-project/
-        - Maven -- Spring boot -- https://start.spring.io/
-        - Gradle -- gs-gradle -- https://github.com/spring-guides/gs-gradle
-    - JavaScript:
-        - NPM -- cowsay-1.4.0 -- https://github.com/piuccio/cowsay
-        - Yarn -- TODO
-    - PHP:
-        - Composer -- hello-pdf -- https://github.com/svanderburg/composer2nix
-        - Composer -- laravel-cli
-    - Python:
-        -- TODO maybe https://github.com/manolomartinez/greg
-    - Ruby:
-        -- TODO
-
-- distributed
-    - TODO
-
-- mobile
-    - Android:
-        - Gradle -- Android CardView Sample -- https://github.com/android/views-widgets-samples/tree/master/CardView/
-        - Ant -- myfirstapp -- https://github.com/svanderburg/nix-androidenvtests
-
-- multitier
-    - Python -- XmlRpc -- https://wiki.python.org/moin/XmlRpc
-
-- web
-    - Laravel
-
-TODO what next? Maybe TypeScript, Rust, Kotlin, Scala, Clojure, Elixir, Dart, WebAssembly, Erlang, F#, ...
-
 ### Project dependencies
 
 There are three ways to get dependencies when using Nix:
@@ -192,28 +142,56 @@ Overview of available ways of getting dependencies in examples by dependency too
 
 ### Example specific notes:
 
+- `desktop/C/hello`
+    - Source: [https://www.gnu.org/software/hello/](https://www.gnu.org/software/hello/)
+
+- `desktop/G/hello`
+    - Source: [https://github.com/golang/go/wiki/Modules](https://github.com/golang/go/wiki/Modules)
+
+- `desktop/Haskell/answer`
+    - Source: [https://github.com/shajra/example-nix](https://github.com/shajra/example-nix)
+
+- `desktop/Haskell/answer-generated`
+    - Source: [https://github.com/shajra/example-nix](https://github.com/shajra/example-nix)
+
 - `desktop/Java/ant-dateutils`
+    - Source: [https://www.mkyong.com/ant/ant-how-to-create-a-java-project/](https://www.mkyong.com/ant/ant-how-to-create-a-java-project/)
     - Project was modified to print current year instead of current date.
 
+- `desktop/Java/gs-gradle`
+    - Source: [https://github.com/spring-guides/gs-gradle](https://github.com/spring-guides/gs-gradle)
+
+- `desktop/Java/spring-boot`
+    - Source: [https://start.spring.io/](https://start.spring.io/)
+
 - `desktop/JavaScript/cowsay`
+    - Source: [https://github.com/piuccio/cowsay](https://github.com/piuccio/cowsay)
     - Project does not contain `package-lock.json`, so it was added.
     - In `package.json` was removed `rollup -c` from prepublish script.
 
 - `desktop/JavaScript/cowsay-fod`
+    - Source: [https://github.com/piuccio/cowsay](https://github.com/piuccio/cowsay)
     - Project does not contain `package-lock.json`, so it was added.
     - In `package.json` was removed `rollup -c` from prepublish script.
 
 - `desktop/PHP/hello-pdf`
+    - Source: [https://github.com/svanderburg/composer2nix](https://github.com/svanderburg/composer2nix)
     - Composer stores some autoloading info in `vendor` directory. For this reason, dependencies must be getting as FOD.
 
 - `desktop/PHP/laravel-cli`
     - Composer stores some autoloading info in `vendor` directory. For this reason, depenedcies must be getted as FOD.
     - Files in `database` must be present when getting dependencies.
 
+- `distributed/Spark/ci`
+    - Inspired by: [Big Data Cloud Computing Infrastructure Framework](https://projekter.aau.dk/projekter/files/313620564/dt107f19_Master_thesis.pdf)
+    - Example Spark Pi estimation is from [http://spark.apache.org/examples.html](http://spark.apache.org/examples.html)
+
 - `mobile/Android/cardview`
+    - Source: [https://github.com/android/views-widgets-samples/tree/master/CardView/](https://github.com/android/views-widgets-samples/tree/master/CardView/)
     - To use Android SDK you must set `android_sdk.accept_license = true;` in Nixpkgs config.
 
 - `mobile/Android/myfirstapp`
+    - Source: [https://github.com/svanderburg/nix-androidenvtests](https://github.com/svanderburg/nix-androidenvtests)
     - To use Android SDK you must set `android_sdk.accept_license = true;` in Nixpkgs config.
 
 - `web/Laravel`
@@ -368,6 +346,11 @@ nix-store --query --tree /nix/store/hash-my-hello-1.0
 Show only path references (first level dependencies):
 ```bash
 nix-store --query --references /nix/store/hash-my-hello-1.0
+```
+
+Repair Nix store:
+```bash
+nix-store --verify --check-contents --repair
 ```
 
 Show derivation:

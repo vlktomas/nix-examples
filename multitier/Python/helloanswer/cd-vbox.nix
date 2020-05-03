@@ -14,28 +14,24 @@ let
 in
   {
 
-    network.description = "Network deployed to VirtualBox";
+    network.description = "Helloanswer deployed to VirtualBox";
 
     server = {
 
       imports = [ deploymentNodes.server ];
 
-      server = {
-        deployment.targetEnv = "virtualbox";
-        deployment.virtualbox.memorySize = 1024; # megabytes
-        deployment.virtualbox.vcpu = 2; # number of cpus
-      };
+      deployment.targetEnv = "virtualbox";
+      deployment.virtualbox.memorySize = 1024; # megabytes
+      deployment.virtualbox.vcpu = 2; # number of cpus
     };
 
     client = {
 
       imports = [ deploymentNodes.client ];
 
-      server = {
-        deployment.targetEnv = "virtualbox";
-        deployment.virtualbox.memorySize = 1024; # megabytes
-        deployment.virtualbox.vcpu = 2; # number of cpus
-      };
+      deployment.targetEnv = "virtualbox";
+      deployment.virtualbox.memorySize = 1024; # megabytes
+      deployment.virtualbox.vcpu = 2; # number of cpus
     };
 
   }

@@ -5,16 +5,12 @@ let
   nixpkgs = import ./nixpkgs.nix { inherit nixpkgsSource localFiles; };
   pkgs = nixpkgs.pkgs;
   lib = nixpkgs.lib;
+  appPackageName = nixpkgs.appPackageName;
 
   deploymentNodes = import ./cd.nix { inherit nixpkgsSource localFiles; };
   deploymentNodesDistributed = import ./cd.nix {
     inherit nixpkgsSource localFiles; databaseLocally = false; storageLocally = false;
   };
-
-  nodeToContainer = node: containerOpts:
-    containerOpts // {
-      config = node;
-    };
 
   mkPipeline = mkPipeline' null;
   mkPipeline' = prev: phases: lib.foldl mkDependency prev phases;
@@ -58,7 +54,7 @@ in
      * Build
      */
 
-    build = pkgs.laravel;
+    build = pkgs."${appPackageName}";
 
 
     /*

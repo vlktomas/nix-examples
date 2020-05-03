@@ -14,24 +14,20 @@ let
 in
   {
 
-    network.description = "Network deployed to NixOS";
+    network.description = "Helloanswer deployed to NixOS";
 
     server = {
 
       imports = [ deploymentNodes.server ];
 
-      server = {
-        deployment.targetHost = "1.2.3.4";
-      };
+      deployment.targetHost = "1.2.3.4";
     };
 
     client = {
 
       imports = [ deploymentNodes.client ];
 
-      server = {
-        deployment.targetHost = "1.2.3.5";
-      };
+      deployment.targetHost = "1.2.3.5";
     };
 
   }
