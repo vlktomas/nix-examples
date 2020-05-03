@@ -236,6 +236,7 @@ in
           scriptTest
           nixosVmTest
           nixosVmContainerTest
+          #nixopsDeployTest
         ]
       )
       (
