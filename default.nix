@@ -23,7 +23,7 @@ rec {
     desktopPhpLaravelCli = import ./desktop/PHP/laravel-cli/ci.nix {};
 
     # distributed
-    # TODO
+    distributedSparkPi = import ./distributed/Spark/pi/ci.nix {};
 
     # mobile
     mobileAndroidCardview = import ./mobile/Android/cardview/ci.nix {};
@@ -34,7 +34,7 @@ rec {
 
     # web
     # FIXME not always reproducible
-    webLaravel = import ./web/Laravel/ci.nix {};
+    webLaravelLaravel = import ./web/Laravel/laravel/ci.nix {};
 
   };
 
