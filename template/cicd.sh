@@ -19,7 +19,7 @@ if [ $1 = "deploy-test" ]; then
     echo "Hello, world!" > expected
     nixops ssh server -- example > given
     diff expected given
-    nixops destroy -d ${DEPLOYMENT_VBOX_NAME}
+    nixops destroy -d ${DEPLOYMENT_VBOX_NAME} --confirm
     nixops delete -d ${DEPLOYMENT_VBOX_NAME}
     exit 0
 fi

@@ -70,7 +70,7 @@ in
     ;
 
     nixosVmTest = nixosTest {
-      nodes = 
+      nodes =
         lib.mapAttrs (
           name: node:
             { ... }: {
@@ -187,6 +187,33 @@ in
     };
 
     nixosVmContainerTestDriver = nixosVmContainerTest.driver;
+
+    # TODO testing with NixOps
+    deployTest =
+      let
+        deploymentName = build.pname;
+      in
+        runCommand "${build.pname}-deploy-test"
+        {
+          buildInputs = [ nixops cacert nix ];
+          src = build.src;
+          NIX_PATH = "nixpkgs=${nixpkgs}";
+        }
+        ''
+          mkdir -p $out
+          cp -pr --reflink=auto -- "$src"/* .
+          nixops create ./cd-vbox.nix -d ${deploymentName}
+          nixops set-args --arg nixpkgsSource ${nixpkgs} -d ${deploymentName}
+          nixops set-args --arg localFiles true -d ${deploymentName}
+          nixops set-args --arg workersCount 2 -d ${deploymentName}
+          nixops info -d ${deploymentName}
+          nixops deploy -d ${deploymentName} --force-reboot
+          sleep 30s
+          nixops ssh master -- systemctl status pi --no-pager -l | grep "Pi is roughly 3.1"
+          nixops destroy -d ${deploymentName} --confirm
+          nixops delete -d ${deploymentName}
+        ''
+    ;
 
 
     /*

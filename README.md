@@ -1,6 +1,6 @@
 # nix-examples (Work In Progress!)
 
-This repository serves as comprehesive list of Nix examples for various technologies. The main goal of these examples is to be as simple as possible, has the same interface and demonstrate possibilities of Nix. Note that examples are created only with official tools available in Nixpkgs. Some examples could be done better with unofficial tools, but using the most effecient solution at any cost is not purpose of these examples.
+This repository serves as comprehensive list of Nix examples for various technologies. The main goal of these examples is to be as simple as possible, has the same interface and demonstrate possibilities of Nix. Note that examples are created only with official tools available in Nixpkgs. Some examples could be done better with unofficial tools, but using the most efficient solution at any cost is not purpose of these examples.
 
 Each project contains from five to nine `.nix` files and optionally deploy script `cicd.sh`:
 
@@ -105,9 +105,9 @@ Run CI pipeline and deploy with NixOps
 
 There are three ways to get dependencies when using Nix:
 
- 1. Dependecies can be easily specified by its name in Nix file (dependencies in Nixpkgs).
- 2. Dependecies derivations can be generated from some file. For example for NPM you can use `node2nix`.
- 3. All dependecies must be treated as one single derivation (Fixed Output Derivation).
+ 1. Dependencies can be easily specified by its name in Nix file (dependencies in Nixpkgs).
+ 2. Dependencies derivations can be generated from some file. For example for NPM you can use `node2nix`.
+ 3. All dependencies must be treated as one single derivation (Fixed Output Derivation).
 
 Overview of available ways of getting dependencies in examples by dependency tool is in following table:
 
@@ -126,7 +126,7 @@ Overview of available ways of getting dependencies in examples by dependency too
 
  * This repo contains source code of common public projects as is. Source files are included in repo only for convenience. If you think that it's violating some license rules please let me know. But keep in mind that this is not real project, included source files are not used for commercial reasons.
 
- * Some source code of projects had to be a little bit modified. For example JavaScript cowsay repo does not contain `package-lock.json`, so this file was added. See section 'Example specific notes' below for other changes.
+ * Some source code of projects had to be a little bit modified. For example JavaScript cowsay repo does not contain `package-lock.json`, so this file was added. See [Example specific notes](#example-specific-notes) below for other changes.
 
  * Each example is self contained and does not have dependency on other files out of its folder. So a lot of code is repeating but it is intentional.
 
@@ -176,10 +176,10 @@ Overview of available ways of getting dependencies in examples by dependency too
 
 - `desktop/PHP/hello-pdf`
     - Source: [https://github.com/svanderburg/composer2nix](https://github.com/svanderburg/composer2nix)
-    - Composer stores some autoloading info in `vendor` directory. For this reason, dependencies must be getting as FOD.
+    - Composer stores some autoloading info in `vendor` directory. For this reason, dependencies must be obtained as FOD.
 
 - `desktop/PHP/laravel-cli`
-    - Composer stores some autoloading info in `vendor` directory. For this reason, depenedcies must be getted as FOD.
+    - Composer stores some autoloading info in `vendor` directory. For this reason, dependencies must be obtained as FOD.
     - Files in `database` must be present when getting dependencies.
 
 - `distributed/Spark/ci`
@@ -195,7 +195,7 @@ Overview of available ways of getting dependencies in examples by dependency too
     - To use Android SDK you must set `android_sdk.accept_license = true;` in Nixpkgs config.
 
 - `web/Laravel`
-    - When deploying Laravel web apps, there is problem with storage path. Unfortunately in Laravel it is not easy to set storage path via `.env`. Changing of `storage_path` in config is not enough, because storage path must be set before config is loaded at all. So you must create `app/Foundation/Application.php` class which extends original Laravel `Application.php` class, in which you change `storage_path`. Next you set new `Application.php` in `bootstrap/app.php` and finnally you can specify `APP_STORAGE_PATH` in `.env`.
+    - When deploying Laravel web apps, there is problem with storage path. Unfortunately in Laravel it is not easy to set storage path via `.env`. Changing of `storage_path` in config is not enough, because storage path must be set before config is loaded at all. So you must create `app/Foundation/Application.php` class which extends original Laravel `Application.php` class, in which you change `storage_path`. Next you set new `Application.php` in `bootstrap/app.php` and finally you can specify `APP_STORAGE_PATH` in `.env`.
     - If local database is used, then user is authenticated via socket authentication. For this reason, in `.env.example` file variable `DB_SOCKET` was added.
 
 ### Other common commands
@@ -250,7 +250,7 @@ This will start an interactive shell in which all environment variables defined 
 nix-shell --pure
 ```
 
-If you customized your `.bashrc`, then you might have some error when running `nix-shell --pure`. It is recommended to stop evaluating `.bashrc` when in `nix-shell`, by adding this line at the begining of `.bashrc`:
+If you customized your `.bashrc`, then you might have some error when running `nix-shell --pure`. It is recommended to stop evaluating `.bashrc` when in `nix-shell`, by adding this line at the beginning of `.bashrc`:
 ```bash
 if [[ -n $IN_NIX_SHELL ]]; then return; fi
 ```
@@ -293,7 +293,7 @@ Export closure:
 nix-store --export $(nix-store -qR $(type -p my-app)) > my-app.closure
 ```
 
-Import closure (user exceuting this command must be trusted or closure must be signed):
+Import closure (user executing this command must be trusted or closure must be signed):
 ```bash
 nix-store --import < my-app.closure
 ```
