@@ -16,27 +16,28 @@ in
 
     network.description = "Spark Pi deployed to VirtualBox";
 
-    master = {
+    master = { config, ... }: {
 
       imports = [ deploymentNodes.master ];
 
-      services.pi.masterIp = "192.168.56.101";
+      services.pi.masterIp = config.networking.privateIPv4;
       services.pi.submitArgs = "--executor-memory 512M --driver-memory 512M";
 
       deployment.targetEnv = "virtualbox";
-      deployment.virtualbox.memorySize = 1536; # megabytes
-      deployment.virtualbox.vcpu = 2; # number of cpus
+      deployment.virtualbox.memorySize = 1536;
+      deployment.virtualbox.vcpu = 2;
     };
 
-  } // lib.listToAttrs (map (n: lib.nameValuePair "worker${lib.fixedWidthNumber 2 n}" {
+  } // lib.listToAttrs (map (n: lib.nameValuePair "worker${lib.fixedWidthNumber 2 n}" ({ config, ... }: {
 
     imports = [ deploymentNodes."worker${lib.fixedWidthNumber 2 n}" ];
 
     services.pi.workerArgs = "--memory 768M";
-    services.pi.workerIp = "192.168.56.1${lib.fixedWidthNumber 2 (n+1)}";
+    services.pi.workerIp = config.networking.privateIPv4;
 
     deployment.targetEnv = "virtualbox";
-    deployment.virtualbox.memorySize = 1536; # megabytes
-    deployment.virtualbox.vcpu = 2; # number of cpus
+    deployment.virtualbox.memorySize = 1536;
+    deployment.virtualbox.vcpu = 2;
 
-  }) (lib.range 1 workersCount))
+  })) (lib.range 1 workersCount))
+

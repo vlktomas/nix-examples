@@ -23,6 +23,7 @@ rec {
     desktopPhpLaravelCli = import ./desktop/PHP/laravel-cli/ci.nix {};
 
     # distributed
+    # FIXME not always reproducible
     distributedSparkPi = import ./distributed/Spark/pi/ci.nix {};
 
     # mobile
@@ -51,7 +52,7 @@ rec {
 
   # all pipelines jobs
   examplesPipelinesJobs = forEach (attrValues examples) (example: example.pipelineJob);
-  #examplesPipelines = catAttrs "pipelineJob" (attrValues examples);
+  #examplesPipelinesJobs = catAttrs "pipelineJob" (attrValues examples);
 
   # all pipelines phases merged
   examplesPipelinesZipped =

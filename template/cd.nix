@@ -19,6 +19,10 @@ in
       imports = [
         ./module.nix
       ];
+
+      services.example.enable = true;
+      services.example.someSecreFile = someSecreFile;
+
     };
 
   }

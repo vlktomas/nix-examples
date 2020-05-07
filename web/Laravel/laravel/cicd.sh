@@ -19,7 +19,7 @@ if [ $1 = "deploy-test" ]; then
     nixops deploy -d ${DEPLOYMENT_VBOX_NAME} --force-reboot
     nixops info -d ${DEPLOYMENT_VBOX_NAME}
     # get webserver IP address
-    WEBSERVER_IP=$(nixops info --deployment laravel-vbox --no-eval --plain | awk '{print $1 " " $(NF)}' | grep webserver | awk '{print $(NF)}')
+    WEBSERVER_IP=$(nixops info -d ${DEPLOYMENT_VBOX_NAME} --no-eval --plain | awk '{print $1 " " $(NF)}' | grep webserver | awk '{print $(NF)}')
     curl --insecure https://${WEBSERVER_IP}
     nixops destroy -d ${DEPLOYMENT_VBOX_NAME} --confirm
     nixops delete -d ${DEPLOYMENT_VBOX_NAME}

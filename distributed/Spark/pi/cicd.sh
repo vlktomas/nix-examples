@@ -18,7 +18,7 @@ if [ $1 = "deploy-test" ]; then
     nixops set-args --arg workersCount 2 -d ${DEPLOYMENT_VBOX_NAME}
     nixops deploy -d ${DEPLOYMENT_VBOX_NAME} --force-reboot
     sleep 30s
-    nixops ssh master -- systemctl status pi --no-pager -l | grep "Pi is roughly 3.1"
+    nixops ssh -d ${DEPLOYMENT_VBOX_NAME} master -- systemctl status pi --no-pager -l | grep "Pi is roughly 3.1"
     nixops destroy -d ${DEPLOYMENT_VBOX_NAME} --confirm
     nixops delete -d ${DEPLOYMENT_VBOX_NAME}
     exit 0

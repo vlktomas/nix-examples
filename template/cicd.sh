@@ -17,7 +17,7 @@ if [ $1 = "deploy-test" ]; then
     nixops create ./cd-vbox.nix -d ${DEPLOYMENT_VBOX_NAME}
     nixops deploy -d ${DEPLOYMENT_VBOX_NAME} --force-reboot
     echo "Hello, world!" > expected
-    nixops ssh server -- example > given
+    nixops ssh -d ${DEPLOYMENT_VBOX_NAME} server -- example > given
     diff expected given
     nixops destroy -d ${DEPLOYMENT_VBOX_NAME} --confirm
     nixops delete -d ${DEPLOYMENT_VBOX_NAME}
