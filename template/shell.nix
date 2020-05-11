@@ -22,7 +22,7 @@ in
   }
   # or
   /*
-  example.overrideAttrs (oldAttrs: {
+  appPackage.overrideAttrs (oldAttrs: {
     src = null;
     # we can add some developement only tools as dependency
     nativeBuildInputs = oldAttrs.nativeBuildInputs ++ [ cowsay ];
