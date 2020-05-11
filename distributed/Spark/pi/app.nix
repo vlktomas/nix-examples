@@ -38,7 +38,7 @@ let
     outputHashMode = "recursive";
     outputHashAlgo = "sha256";
     #outputHash = stdenv.lib.fakeSha256;
-    outputHash = "0kr2g4nbr5l00sd3z1z6yawcfiwhwb7fq2pnnk4nm1a9r373w6sa";
+    outputHash = "0vks2rvpfdx36wq6v581ly1isq3gb75haiyqnbwgi6hs40g9gmwh";
   };
 in
   stdenv.mkDerivation rec {

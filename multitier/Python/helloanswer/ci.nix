@@ -63,6 +63,13 @@ in
 
 
     /*
+     * Build
+     */
+
+    build = [ server.build client.build ];
+
+
+    /*
      * Test
      */
 
