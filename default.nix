@@ -12,18 +12,13 @@ rec {
     desktopHaskellAnswerGenerated = import ./desktop/Haskell/answer-generated/ci.nix {};
     desktopJavaAntDateUtils = import ./desktop/Java/ant-dateutils/ci.nix {};
     desktopJavaGsGradle = import ./desktop/Java/gs-gradle/ci.nix {};
-    # FIXME not always reproducible
     desktopJavaSpringBoot = import ./desktop/Java/spring-boot/ci.nix {};
-    # FIXME not always reproducible
     desktopJavaScriptCowsay = import ./desktop/JavaScript/cowsay/ci.nix {};
-    # FIXME not always reproducible
     desktopJavaScriptCowsayFod = import ./desktop/JavaScript/cowsay-fod/ci.nix {};
     desktopPhpHelloPdf = import ./desktop/PHP/hello-pdf/ci.nix {};
-    # FIXME not always reproducible
     desktopPhpLaravelCli = import ./desktop/PHP/laravel-cli/ci.nix {};
 
     # distributed
-    # FIXME not always reproducible
     distributedSparkPi = import ./distributed/Spark/pi/ci.nix {};
 
     # mobile
@@ -34,7 +29,6 @@ rec {
     multitierPythonHelloanswer = import ./multitier/Python/helloanswer/ci.nix {};
 
     # web
-    # FIXME not always reproducible
     webLaravelLaravel = import ./web/Laravel/laravel/ci.nix {};
 
   };

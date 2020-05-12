@@ -1,0 +1,18 @@
+version: 2.1
+
+jobs:
+  build:
+    docker:
+      - image: nixorg/nix:circleci
+    steps:
+      - checkout
+      - run:
+          name: Run CI pipeline
+          command: |
+            nix-build ci.nix -A pipelineJob
+            mkdir output
+            cp -RL result/* output/
+            rm result
+      - store_artifacts:
+          path: output/
+

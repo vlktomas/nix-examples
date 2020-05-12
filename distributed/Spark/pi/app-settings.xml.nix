@@ -64,6 +64,8 @@ let
     installPhase = ''
       mkdir -p $out
       mvn dependency:go-offline -Dmaven.repo.local="$out" --update-snapshots
+      find $out -name _maven.repositories -exec rm -v {} \;
+      find $out -name _remote.repositories -exec rm -v {} \;
     '';
 
     outputHashMode = "recursive";

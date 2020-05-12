@@ -169,12 +169,11 @@ in
         }
     );
 
-    # FIXME for laravel we must copy vendor dir and run composer dump-autoload
     configurePhase = ''
-      #ln -s ${deps} vendor
-      mkdir vendor
-      cp -R ${deps}/* vendor
-      chmod -R u+w vendor/composer
+      mkdir -p vendor/composer
+      cp ${deps}/composer/* vendor/composer/
+      shopt -s extglob
+      ln -s ${deps}/!(composer) vendor/
       ln -s ${nodePackage}/lib/node_modules/laravel-node-dependencies/node_modules node_modules
     '';
 

@@ -36,12 +36,14 @@ let
       mvn dependency:go-offline -Dmaven.repo.local="$out" --update-snapshots
       # download surefire-junit-platform which is not explicitly defined as dependency
       mvn dependency:get -Dmaven.repo.local="$out" -Dartifact=org.apache.maven.surefire:surefire-junit-platform:2.22.2
+      find $out -name _maven.repositories -exec rm -v {} \;
+      find $out -name _remote.repositories -exec rm -v {} \;
     '';
 
     outputHashMode = "recursive";
     outputHashAlgo = "sha256";
     #outputHash = stdenv.lib.fakeSha256;
-    outputHash = "1vcz8s9gjrzrq02gbzxz6q5w0fz3si3n6c1bqqc3px1wfarf4ry2";
+    outputHash = "1vhzvaa08wyk4265fjqi1l0yzcsf4wyxapdzr1ibyhdg4c3bwlh2";
   };
 in
   stdenv.mkDerivation rec {

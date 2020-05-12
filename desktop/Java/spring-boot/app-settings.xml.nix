@@ -67,6 +67,8 @@ let
       mvn dependency:go-offline -Dmaven.repo.local="$out" --update-snapshots
       # download surefire-junit-platform which is not explicitly defined as dependency
       mvn dependency:get -Dartifact=org.apache.maven.surefire:surefire-junit-platform:2.22.2
+      find $out -name _maven.repositories -exec rm -v {} \;
+      find $out -name _remote.repositories -exec rm -v {} \;
     '';
 
     outputHashMode = "recursive";

@@ -10,7 +10,19 @@ in
     inputsFrom = [ appPackage ];
     src = null;
     shellHook = ''
-      [ ! -e vendor ] && ln -s ${appPackage.deps} vendor
-      trap "rm vendor" EXIT
+      if [ ! -e vendor ] ; then
+        mkdir -p vendor/composer
+        cp ${appPackage.deps}/composer/* vendor/composer/
+        shopt -s extglob
+        ln -s ${appPackage.deps}/!(composer) vendor/
+        composer dump-autoload
+        DEPENDENCIES_LINKED=true
+      fi
+
+      exitHandler () {
+          [ ! -z $DEPENDENCIES_LINKED ] && rm -rf vendor
+      }
+
+      trap exitHandler EXIT
     '';
   }

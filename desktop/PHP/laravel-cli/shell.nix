@@ -9,12 +9,20 @@ in
   pkgs.mkShell {
     inputsFrom = [ appPackage ];
     src = null;
-
-    # FIXME for laravel we must copy vendor dir and run composer dump-autoload
     shellHook = ''
-      [ ! -e vendor ] && mkdir vendor && cp -R ${appPackage.deps}/* vendor
-      chmod -R u+w vendor
-      composer dump-autoload
-      trap "rm -rf vendor" EXIT
+      if [ ! -e vendor ] ; then
+        mkdir -p vendor/composer
+        cp ${appPackage.deps}/composer/* vendor/composer/
+        shopt -s extglob
+        ln -s ${appPackage.deps}/!(composer) vendor/
+        composer dump-autoload
+        DEPENDENCIES_LINKED=true
+      fi
+
+      exitHandler () {
+          [ ! -z $DEPENDENCIES_LINKED ] && rm -rf vendor
+      }
+
+      trap exitHandler EXIT
     '';
   }

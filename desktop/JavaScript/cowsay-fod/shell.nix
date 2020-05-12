@@ -12,8 +12,17 @@ in
 
     # FIXME we must copy node_modules dir
     shellHook = ''
-      [ ! -e node_modules ] && mkdir node_modules && cp -R ${appPackage.deps}/* node_modules
-      chmod -R u+w node_modules
-      trap "rm -rf node_modules" EXIT
+      if [ ! -e node_modules ] ; then
+        mkdir node_modules
+        cp -R ${appPackage.deps}/* node_modules
+        chmod -R u+w node_modules
+        DEPENDENCIES_LINKED=true
+      fi
+
+      exitHandler () {
+          [ ! -z $DEPENDENCIES_LINKED ] && rm -rf node_modules
+      }
+
+      trap exitHandler EXIT
     '';
   }

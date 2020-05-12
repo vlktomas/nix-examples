@@ -1,0 +1,14 @@
+image: nixos/nix
+
+stages:
+  - build
+
+compile:
+  stage: build
+  script:
+  - nix-build ci.nix -A pipelineJob
+  - cp -RL result/* .
+  - rm result
+  artifacts:
+    untracked: true
+

@@ -1,0 +1,22 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Pipeline') {
+            steps {
+                // we assume that Nix is installed
+                sh '''
+                    export USER=jenkins
+                    echo $USER
+                    . ~/.nix-profile/etc/profile.d/nix.sh
+                    nix-build ci.nix -A pipelineJob
+                    mkdir output
+                    cp -RL result/* output/
+                    rm result
+                '''
+                archiveArtifacts artifacts: 'output/**'
+            }
+        }
+    }
+}
+

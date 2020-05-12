@@ -1,0 +1,23 @@
+name: CI
+on:
+  pull_request:
+  push:
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: cachix/install-nix-action@v8
+
+      - name: Pipeline
+        run: |
+          nix-build ci.nix -A pipelineJob
+          mkdir output
+          cp -RL result/* output/
+          rm result
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: result
+          path: ./output/*
+

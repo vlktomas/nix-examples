@@ -333,8 +333,8 @@ in
       )
       (
         phase "release" [
-          tarball
-          dockerImage
+          #tarball
+          #dockerImage
         ]
       )
     ];

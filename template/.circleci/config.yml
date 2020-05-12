@@ -1,0 +1,23 @@
+version: 2.1
+
+jobs:
+  build:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - checkout
+      - run:
+          name: Install Nix
+          command: |
+            curl https://nixos.org/nix/install | sh
+      - run:
+          name: Run CI pipeline
+          command: |
+            . /home/circleci/.nix-profile/etc/profile.d/nix.sh
+            nix-build ci.nix -A pipelineJob
+            mkdir output
+            cp -RL result/* output/
+            rm result
+      - store_artifacts:
+          path: output/
+

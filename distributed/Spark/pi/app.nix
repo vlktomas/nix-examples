@@ -33,12 +33,14 @@ let
     installPhase = ''
       mkdir -p $out
       mvn dependency:go-offline -Dmaven.repo.local="$out" --update-snapshots
+      find $out -name _maven.repositories -exec rm -v {} \;
+      find $out -name _remote.repositories -exec rm -v {} \;
     '';
 
     outputHashMode = "recursive";
     outputHashAlgo = "sha256";
     #outputHash = stdenv.lib.fakeSha256;
-    outputHash = "11zyj7lh0iq8wzr47fwq57wk8i5674xlnph4dczxcsnbpj9mjcy9";
+    outputHash = "1vnzwmr2bsk8i7dcmc94ir54v7kgbr7z0nsyalpjrsvkh5vwil2z";
   };
 in
   stdenv.mkDerivation rec {

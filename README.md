@@ -14,7 +14,7 @@ Each project contains from five to nine `.nix` files and optionally deploy scrip
 * `cd-*.nix` -- physical deployment specification for NixOps (for example `cd-vbox.nix` describe deployment to VirtualBox machines)
 * `cicd.sh` -- run Nix for CI pipeline and NixOps for deployment
 
-There is template for new example, which contains only these files with some additional info.
+To start new project just copy `template` directory, which contains these files with some additional info and example configuration for various CI/CD tools.
 
 ## How to use
 
@@ -181,11 +181,11 @@ Overview of available ways of getting dependencies in examples by dependency too
 
 - `desktop/PHP/hello-pdf`
     - Source: [https://github.com/svanderburg/composer2nix](https://github.com/svanderburg/composer2nix)
-    - Composer stores some autoloading info in `vendor` directory. For this reason, dependencies must be obtained as FOD.
+    - To reproducible build of dependencies, specify the `autoloader-suffix` in `composer.json`.
 
 - `desktop/PHP/laravel-cli`
-    - Composer stores some autoloading info in `vendor` directory. For this reason, dependencies must be obtained as FOD.
     - Files in `database` must be present when getting dependencies.
+    - To reproducible build of dependencies, specify the `autoloader-suffix` in `composer.json`.
 
 - `distributed/Spark/pi`
     - Inspired by: [Big Data Cloud Computing Infrastructure Framework](https://projekter.aau.dk/projekter/files/313620564/dt107f19_Master_thesis.pdf)
@@ -200,6 +200,8 @@ Overview of available ways of getting dependencies in examples by dependency too
     - To use Android SDK you must set `android_sdk.accept_license = true;` in Nixpkgs config.
 
 - `web/Laravel/laravel`
+    - Files in `database` must be present when getting dependencies.
+    - To reproducible build of dependencies, specify the `autoloader-suffix` in `composer.json`.
     - When deploying Laravel web apps, there is problem with storage path. Unfortunately in Laravel it is not easy to set storage path via `.env`. Changing of `storage_path` in config is not enough, because storage path must be set before config is loaded at all. So you must create `app/Foundation/Application.php` class which extends original Laravel `Application.php` class, in which you change `storage_path`. Next you set new `Application.php` in `bootstrap/app.php` and finally you can specify `APP_STORAGE_PATH` in `.env`.
     - If local database is used, then user is authenticated via socket authentication. For this reason, in `.env.example` file variable `DB_SOCKET` was added.
 

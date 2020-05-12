@@ -1,0 +1,4 @@
+language: nix
+nix: 2.3.4
+script: nix-build -A pipelineJob ci.nix
+

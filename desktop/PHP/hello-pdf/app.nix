@@ -29,7 +29,7 @@ let
     );
 
     buildPhase = ''
-      composer install
+      composer install --no-autoloader
     '';
 
     installPhase = ''
@@ -40,7 +40,7 @@ let
     outputHashMode = "recursive";
     outputHashAlgo = "sha256";
     #outputHash = stdenv.lib.fakeSha256;
-    outputHash = "051zb9bqbrxkn27ylhmg7vslfacg19mfnh4bf2b2ppr8464h2snw";
+    outputHash = "1hallv8j75x8m90rddw8xal7a50svxs2m0mmhfsp38ajgmm92xy1";
   };
 
 in
@@ -49,7 +49,7 @@ in
 
     inherit pname version;
 
-    nativeBuildInputs = [ makeWrapper ];
+    nativeBuildInputs = [ phpPackages.composer makeWrapper ];
     propagatedBuildInputs = [ php deps ];
 
     src = (
@@ -62,7 +62,14 @@ in
     );
 
     configurePhase = ''
-      ln -s ${deps} vendor
+      mkdir -p vendor/composer
+      cp ${deps}/composer/* vendor/composer/
+      shopt -s extglob
+      ln -s ${deps}/!(composer) vendor/
+    '';
+
+    buildPhase = ''
+      composer dump-autoload --optimize
     '';
 
     installPhase = ''
