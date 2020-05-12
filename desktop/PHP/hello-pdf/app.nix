@@ -40,7 +40,7 @@ let
     outputHashMode = "recursive";
     outputHashAlgo = "sha256";
     #outputHash = stdenv.lib.fakeSha256;
-    outputHash = "0vq845j6jbr5jfnz82yjx2d8j5jd0i21gqzhp4liyvwjv1zrpwcf";
+    outputHash = "051zb9bqbrxkn27ylhmg7vslfacg19mfnh4bf2b2ppr8464h2snw";
   };
 
 in
