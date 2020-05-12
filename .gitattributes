@@ -1,0 +1,13 @@
+* text=auto
+desktop/** linguist-vendored
+desktop/**/*.nix -linguist-vendored
+distributed/** linguist-vendored
+distributed/**/*.nix -linguist-vendored
+mobile/** linguist-vendored
+mobile/**/*.nix -linguist-vendored
+multitier/** linguist-vendored
+multitier/**/*.nix -linguist-vendored
+web/** linguist-vendored
+web/**/*.nix -linguist-vendored
+nixpkgs-* export-ignore
+
