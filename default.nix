@@ -14,7 +14,7 @@ rec {
     desktopJavaGsGradle = import ./desktop/Java/gs-gradle/ci.nix {};
     desktopJavaSpringBoot = import ./desktop/Java/spring-boot/ci.nix {};
     desktopJavaScriptCowsay = import ./desktop/JavaScript/cowsay/ci.nix {};
-    # FIXME broken (it want to create /homeless-shelter/.npm/_locks)
+    # FIXME broken (it wants to create /homeless-shelter/.npm/_locks)
     #desktopJavaScriptCowsayFod = import ./desktop/JavaScript/cowsay-fod/ci.nix {};
     desktopPhpHelloPdf = import ./desktop/PHP/hello-pdf/ci.nix {};
     desktopPhpLaravelCli = import ./desktop/PHP/laravel-cli/ci.nix {};
@@ -23,7 +23,8 @@ rec {
     distributedSparkPi = import ./distributed/Spark/pi/ci.nix {};
 
     # mobile
-    mobileAndroidCardview = import ./mobile/Android/cardview/ci.nix {};
+    # FIXME broken (aapt2 linker)
+    #mobileAndroidCardview = import ./mobile/Android/cardview/ci.nix {};
     mobileAndroidMyfirstapp = import ./mobile/Android/myfirstapp/ci.nix {};
 
     # multitier
