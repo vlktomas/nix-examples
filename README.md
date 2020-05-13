@@ -38,7 +38,7 @@ Run all examples CI pipelines up to second phase (numbered from zero):
 nix-build -A examplesPipelinesZipped.1
 ```
 
-Run all examples CI pipelines up to 'test' phase:
+Run all examples CI pipelines up to "test" phase:
 ```bash
 nix-build -E '(import ./default.nix).examplesPipelinePhase "test"'
 ```
@@ -81,7 +81,7 @@ Run CI pipeline up to second phase (numbered from zero):
 nix-build ci.nix -A pipeline.1
 ```
 
-Run CI pipeline up to 'test' phase:
+Run CI pipeline up to "test" phase:
 ```bash
 nix-build -E 'builtins.filter (phase: phase.name == "phase-test") (import ./ci.nix {}).pipeline'
 ```

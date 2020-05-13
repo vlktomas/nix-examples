@@ -29,6 +29,7 @@ let
     );
 
     buildPhase = ''
+      export npm_config_cache=$(mktemp -d)
       npm install
     '';
 
