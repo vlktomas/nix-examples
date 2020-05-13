@@ -22,8 +22,7 @@ rec {
     distributedSparkPi = import ./distributed/Spark/pi/ci.nix {};
 
     # mobile
-    # FIXME broken (aapt2 linker)
-    #mobileAndroidCardview = import ./mobile/Android/cardview/ci.nix {};
+    mobileAndroidCardview = import ./mobile/Android/cardview/ci.nix {};
     mobileAndroidMyfirstapp = import ./mobile/Android/myfirstapp/ci.nix {};
 
     # multitier

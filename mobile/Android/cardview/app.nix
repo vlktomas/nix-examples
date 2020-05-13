@@ -1,6 +1,6 @@
 {
   # dependencies
-  stdenv, fetchurl, nix-gitignore, androidsdk_9_0, gradle, perl, writeText, makeWrapper,
+  stdenv, fetchurl, nix-gitignore, androidsdk_9_0, gradle, perl, zip, unzip, writeText, makeWrapper,
 
   # args
   localFiles ? false,
@@ -18,7 +18,7 @@ let
   deps = stdenv.mkDerivation rec {
     name = "${pname}-${version}-deps";
 
-    nativeBuildInputs = [ gradle perl ];
+    nativeBuildInputs = [ gradle perl zip unzip ];
 
     src = (
       if localFiles then
@@ -66,10 +66,39 @@ let
         | sh
     '';
 
+    # On Linux, we need to patch the interpreter in Java packages that contain native executables to use Nix's interpreter instead
+    # see https://github.com/status-im/status-react/pull/8549/
+    fixupPhase = ''
+      prevSet=$-
+      set -e
+
+      # Patch executables from maven dependency to use Nix's interpreter
+      tmpDir=$(mktemp -d)
+      # patchelf aapt2
+      depPath=$(find $out -regex '.*aapt2.*linux\.jar')
+      echo $depPath
+      unzip $depPath -d $tmpDir
+      for exe in `find $tmpDir/ -type f -executable`; do
+        patchelf --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" $exe
+        # set the same timestamp as NOTICE file
+        touch --reference $tmpDir/NOTICE $exe
+        ls -al $tmpDir
+      done
+
+      # Rebuild the .jar file with patched binaries
+      pushd $tmpDir > /dev/null
+      rm $depPath
+      zip $depPath -rX *
+      popd > /dev/null
+      rm -rf $tmpDir
+
+      set $prevSet
+    '';
+
     outputHashMode = "recursive";
     outputHashAlgo = "sha256";
     #outputHash = stdenv.lib.fakeSha256;
-    outputHash = "1b9xc8g9vv7d9slvgkdf193739dw7frs49wv32sjf9qsvwvyrh99";
+    outputHash = "0x6l2wnpw4s1kalfassqh4z1lcqqbz50dpk2x1wlgd0zfdwznlij";
   };
 
   gradleInit = writeText "init.gradle" ''
@@ -107,16 +136,13 @@ in
         }
     );
 
-    # FIXME gradle creates aapt2 in GRADLE_USER_HOME but with bad ld interpreter
-    # so correct aapt2 ld interpreter is symlinked
     buildPhase = ''
       export GRADLE_USER_HOME=$(mktemp -d)
       export ANDROID_SDK_ROOT=${androidsdk_9_0}/libexec/android-sdk
       export ANDROID_HOME=${androidsdk_9_0}/libexec
       export ANDROID_SDK_HOME=$(mktemp -d)
+      export PATH="$ANDROID_SDK_ROOT/bin:$ANDROID_SDK_ROOT/tools:$ANDROID_SDK_ROOT/tools/bin:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_SDK_ROOT/build-tools/28.0.3:$PATH"
       # point to local deps repo
-      mkdir -p /lib64
-      ln -s $(cat $NIX_CC/nix-support/dynamic-linker) /lib64/ld-linux-x86-64.so.2
       gradle --offline --no-daemon --no-build-cache --info --init-script ${gradleInit} ${if release then "assembleRelease" else "assembleDebug"}
     '';
 
@@ -125,7 +151,7 @@ in
     '';
 
     passthru = {
-      inherit deps;
+      inherit deps gradleInit;
     };
 
     meta = with stdenv.lib; {
