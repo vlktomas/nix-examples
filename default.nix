@@ -14,7 +14,8 @@ rec {
     desktopJavaGsGradle = import ./desktop/Java/gs-gradle/ci.nix {};
     desktopJavaSpringBoot = import ./desktop/Java/spring-boot/ci.nix {};
     desktopJavaScriptCowsay = import ./desktop/JavaScript/cowsay/ci.nix {};
-    desktopJavaScriptCowsayFod = import ./desktop/JavaScript/cowsay-fod/ci.nix {};
+    # FIXME broken (it want to create /homeless-shelter/.npm/_locks)
+    #desktopJavaScriptCowsayFod = import ./desktop/JavaScript/cowsay-fod/ci.nix {};
     desktopPhpHelloPdf = import ./desktop/PHP/hello-pdf/ci.nix {};
     desktopPhpLaravelCli = import ./desktop/PHP/laravel-cli/ci.nix {};
 

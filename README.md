@@ -14,7 +14,7 @@ Each project contains from five to nine `.nix` files and optionally deploy scrip
 * `cd-*.nix` -- physical deployment specification for NixOps (for example `cd-vbox.nix` describe deployment to VirtualBox machines)
 * `cicd.sh` -- run Nix for CI pipeline and NixOps for deployment
 
-To start new project just copy `template` directory, which contains these files with some additional info and example configuration for various CI/CD tools.
+To start new project just copy `template` directory, which contains these files with additional info. There is also an example configuration for some CI/CD tools, but beware that NixOS testing will not work in those, which use virtual machines or Docker.
 
 ## How to use
 
