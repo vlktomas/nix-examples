@@ -1,4 +1,4 @@
-# nix-examples (Work In Progress!)
+# nix-examples
 
 This repository serves as comprehensive list of Nix examples for various technologies. The main goal of these examples is to be as simple as possible, has the same interface and demonstrate possibilities of Nix. Note that examples are created only with official tools available in Nixpkgs. Some examples could be done better with unofficial tools, but using the most efficient solution at any cost is not purpose of these examples.
 
