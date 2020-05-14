@@ -297,14 +297,6 @@ in
      * Release
      */
 
-    tarball = releaseTools.sourceTarball {
-      buildInputs = [ gettext texinfo ];
-      src = build.src;
-      name = build.pname;
-      version = build.version;
-      inherit stdenv autoconf automake libtool;
-    };
-
     dockerImage = dockerTools.buildImage {
       name = "${build.pname}";
       tag = "latest";
@@ -333,8 +325,7 @@ in
       )
       (
         phase "release" [
-          #tarball
-          #dockerImage
+          dockerImage
         ]
       )
     ];

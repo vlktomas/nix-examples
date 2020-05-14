@@ -7,7 +7,6 @@ pipeline {
                 // we assume that Nix is installed
                 sh '''
                     export USER=jenkins
-                    echo $USER
                     . ~/.nix-profile/etc/profile.d/nix.sh
                     nix-build ci.nix -A pipelineJob
                     mkdir output

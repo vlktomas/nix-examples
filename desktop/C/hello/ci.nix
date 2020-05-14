@@ -141,12 +141,6 @@ in
       name = "${build.pname}-${build.version}-deb";
     };
 
-    rpmPackage = releaseTools.rpmBuild {
-      diskImage = vmTools.diskImageFuns.fedora27x86_64 {};
-      src = build.src;
-      name = "${build.pname}-${build.version}-rpm";
-    };
-
     snapPackage = snapTools.makeSnap {
       meta = {
         name = build.pname;
@@ -219,13 +213,12 @@ in
       )
       (
         phase "release" [
-          #tarball
-          #debPackage
-          #rpmPackage
-          #snapPackage
-          #dockerImage
-          #ociContainer
-          #nixosIso
+          tarball
+          debPackage
+          snapPackage
+          dockerImage
+          ociContainer
+          nixosIso
         ]
       )
     ];

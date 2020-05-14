@@ -20,4 +20,3 @@ jobs:
             rm result
       - store_artifacts:
           path: output/
-

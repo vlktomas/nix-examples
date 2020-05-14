@@ -71,14 +71,6 @@ in
      * Release
      */
 
-    tarball = releaseTools.sourceTarball {
-      buildInputs = [ gettext texinfo ];
-      src = build.src;
-      name = build.pname;
-      version = build.version;
-      inherit stdenv autoconf automake libtool;
-    };
-
 
     /*
      * Pipeline
@@ -97,7 +89,6 @@ in
       )
       (
         phase "release" [
-          #tarball
         ]
       )
     ];

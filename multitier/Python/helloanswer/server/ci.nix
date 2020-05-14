@@ -55,9 +55,6 @@ in
     /*
      * Test
      */
-    /*
-     * Test
-     */
 
     scriptTest = runCommand "${build.pname}-test"
       { nativeBuildInputs = [ build ]; }
@@ -73,26 +70,6 @@ in
     /*
      * Release
      */
-
-    tarball = releaseTools.sourceTarball {
-      buildInputs = [ gettext texinfo ];
-      src = build.src;
-      name = build.pname;
-      version = build.version;
-      inherit stdenv autoconf automake libtool;
-    };
-
-    debPackage = releaseTools.debBuild {
-      diskImage = vmTools.diskImageFuns.debian8x86_64 {};
-      src = build.src;
-      name = "${build.pname}-${build.version}-deb";
-    };
-
-    rpmPackage = releaseTools.rpmBuild {
-      diskImage = vmTools.diskImageFuns.fedora27x86_64 {};
-      src = build.src;
-      name = "${build.pname}-${build.version}-rpm";
-    };
 
     snapPackage = snapTools.makeSnap {
       meta = {
@@ -164,13 +141,10 @@ in
       )
       (
         phase "release" [
-          #tarball
-          #debPackage
-          #rpmPackage
-          #snapPackage
-          #dockerImage
-          #ociContainer
-          #nixosIso
+          snapPackage
+          dockerImage
+          ociContainer
+          nixosIso
         ]
       )
     ];
