@@ -259,7 +259,7 @@ in
       )
       (
         phase "release" [
-          # run server and client pipeline up ro release phase
+          # run server and client pipeline up to release phase
           (builtins.filter (phase: phase.name == "phase-release") server.pipeline)
           (builtins.filter (phase: phase.name == "phase-release") client.pipeline)
         ]

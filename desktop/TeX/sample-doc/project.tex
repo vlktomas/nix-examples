@@ -1,0 +1,204 @@
+\documentclass[11pt, a4paper]{article}
+
+% pdflatex
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+% fonts tuned for Czech / Slovak (for example, better diacritics position)
+
+% xelatex, lualatex
+%\usepackage{fontspec}
+
+\usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true]{microtype}
+% activate={true,nocompatibility} - activate protrusion and expansion
+% final - enable microtype; use "draft" to disable
+% tracking=true, kerning=true, spacing=true - activate these techniques
+% factor=1100 - add 10% to the protrusion amount (default is 1000)
+% stretch=10, shrink=10 - reduce stretchability/shrinkability (default is 20/20)
+
+\usepackage[czech]{babel}
+\usepackage[left=2cm, text={17cm, 24cm},top=3cm]{geometry}
+\usepackage[unicode]{hyperref}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage[shortlabels]{enumitem}
+\usepackage{subcaption}
+\usepackage{blindtext}
+
+% zero parindent and non-zero parskip.
+%\usepackage[parfill]{parskip}
+
+\graphicspath{{images/}{plots/}{photos/}{diagrams/}}
+
+% title
+\title{Title}
+\author{Tomáš Vlk}
+\date{\today}
+
+\begin{document}
+
+  \maketitle
+
+  \section{Introduction}
+  \label{sec:Introduction}
+
+	\begin{itemize}
+		\item First item
+		\item Second item
+	\end{itemize}
+
+	\begin{itemize}[label={--}]
+		\item First item
+		\item Second item
+	\end{itemize}
+
+	\begin{enumerate}
+		\item First item
+		\item Second item
+	\end{enumerate}
+
+	\begin{enumerate}[label=\alph*)] % or \roman* or \Roman* or \arabic*
+		\item First item
+		\item Second item
+	\end{enumerate}
+
+	\begin{proof}[Proof name.]
+	\label{proof:proof1}
+	Proof
+	\end{proof}
+
+	\blindtext
+	%\Blindtext
+	%\blinditemize
+	%\blindenumerate
+	%\blinddescription
+	%\blinddocument
+	%\Blinddocument
+	%\blindmathpaper
+
+	\begin{figure}[ht]
+		\centering
+		\includegraphics[width=0.5\textwidth]{example-image-golden}
+		\caption{
+			\label{fig:image1}
+			Figure caption.
+		}
+	\end{figure}
+
+	\begin{figure}[ht]
+		\centering
+		\begin{subfigure}{0.31\textwidth}
+			\centering
+			\noindent\includegraphics[width=1\textwidth]{example-image-a}
+			\caption{
+				\label{fig:subimage1}
+				Figure subcaption.
+			}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}{0.31\textwidth}
+			\centering
+			\noindent\includegraphics[width=1\textwidth]{example-image-b}
+			\caption{
+				\label{fig:subimage2}
+				Figure subcaption.
+			}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}{0.31\textwidth}
+			\centering
+			\noindent\includegraphics[width=1\textwidth]{example-image-c}
+			\caption{
+				\label{fig:subimage3}
+				Figure subcaption.
+			}
+		\end{subfigure}
+		\caption{
+			\label{fig:image2}
+			Figure caption.
+		}
+	\end{figure}
+
+	\begin{figure}[ht]
+		\centering
+		\begin{subfigure}{0.48\textwidth}
+			\centering
+			\noindent\includegraphics[width=1\textwidth]{example-image-a}
+			\caption{
+				\label{fig:subimage4}
+				Figure subcaption.
+			}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}{0.48\textwidth}
+			\centering
+			\noindent\includegraphics[width=1\textwidth]{example-image-b}
+			\caption{
+				\label{fig:subimage5}
+				Figure subcaption.
+			}
+		\end{subfigure}
+		\caption{
+			\label{fig:image3}
+			Figure caption.
+		}
+	\end{figure}
+
+    \begin{table}[ht]
+    	\catcode`\-=12
+		\vskip1em
+        \centering
+        \begin{tabular}[ht]{|c|c|}
+        	\hline
+            $A$ & $\neg A$ \\ \hline
+            \textbf{P} & N \\ \hline
+            \textbf{O} & O~\\ \hline
+            \textbf{X} & X \\ \hline
+            \textbf{N} & P \\ \hline
+        \end{tabular}
+        \begin{tabular}[ht]{|c|c|c|c|c|c|}
+        	\hline
+            \multicolumn{2}{|c|}{\multirow{2}{*}{$A \wedge B$}} & \multicolumn{4}{c|}{$B$} \\ \cline{3-6}
+             \multicolumn{2}{|c|}{} & \textbf{P} & \textbf{O} & \textbf{X} & \textbf{N} \\ \hline
+            \multirow{4}{*}{$A$} & \textbf{P} & P & O~& X & N \\ \cline{2-6}
+            & \textbf{O} & O~& O~& N & N \\ \cline{2-6}
+            & \textbf{X} & X & N & X & N \\ \cline{2-6}
+            & \textbf{N} & N & N & N & N \\ \hline
+        \end{tabular}
+        \begin{tabular}[ht]{|c|c|c|c|c|c|}
+        	\hline
+            \multicolumn{2}{|c|}{\multirow{2}{*}{$A \vee B$}} & \multicolumn{4}{c|}{$B$} \\ \cline{3-6}
+             \multicolumn{2}{|c|}{} & \textbf{P} & \textbf{O} & \textbf{X} & \textbf{N} \\ \hline
+            \multirow{4}{*}{$A$} & \textbf{P} & P & P & P & P \\ \cline{2-6}
+            & \textbf{O} & P & O~& P & O~\\ \cline{2-6}
+            & \textbf{X} & P & P & X & X \\ \cline{2-6}
+            & \textbf{N} & P & O~& X & N \\ \hline
+        \end{tabular}
+        \begin{tabular}[ht]{|c|c|c|c|c|c|}
+        	\hline
+            \multicolumn{2}{|c|}{\multirow{2}{*}{$A \rightarrow B$}} & \multicolumn{4}{c|}{$B$} \\ \cline{3-6}
+             \multicolumn{2}{|c|}{} & \textbf{P} & \textbf{O} & \textbf{X} & \textbf{N} \\ \hline
+            \multirow{4}{*}{$A$} & \textbf{P} & P & O~& X & N \\ \cline{2-6}
+            & \textbf{O} & P & O~& P & O~\\ \cline{2-6}
+            & \textbf{X} & P & P & X & X \\ \cline{2-6}
+            & \textbf{N} & P & P & P & P \\ \hline
+        \end{tabular}
+        \caption{Four-valued logic}
+        \label{tab:logic}
+    \end{table}
+
+    \section{Implemenentation}
+    \label{sec:Implementation}
+
+      Test \cite{example}
+
+    \section{Conclustion}
+    \label{sec:Conclusion}
+
+  \bibliographystyle{plain}
+  \bibliography{bibliography}
+
+\end{document}

@@ -17,6 +17,8 @@ rec {
     desktopJavaScriptCowsayFod = import ./desktop/JavaScript/cowsay-fod/ci.nix {};
     desktopPhpHelloPdf = import ./desktop/PHP/hello-pdf/ci.nix {};
     desktopPhpLaravelCli = import ./desktop/PHP/laravel-cli/ci.nix {};
+    desktopPythonAnswer = import ./desktop/Python/answer/ci.nix {};
+    desktopTexSampleDoc = import ./desktop/TeX/sample-doc/ci.nix {}; # this is not really desktop app
 
     # distributed
     distributedSparkPi = import ./distributed/Spark/pi/ci.nix {};

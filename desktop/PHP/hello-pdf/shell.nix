@@ -10,6 +10,8 @@ in
     inputsFrom = [ appPackage ];
     src = null;
     shellHook = ''
+      export PATH="$PWD/vendor/bin/:$PATH"
+
       if [ ! -e vendor ] ; then
         mkdir -p vendor/composer
         cp ${appPackage.deps}/composer/* vendor/composer/

@@ -12,6 +12,8 @@ in
 
     # FIXME we must copy node_modules dir
     shellHook = ''
+      export PATH="$PWD/node_modules/.bin/:$PATH"
+
       if [ ! -e node_modules ] ; then
         mkdir node_modules
         cp -R ${appPackage.deps}/* node_modules

@@ -209,6 +209,7 @@ Overview of available ways of getting dependencies in examples by dependency too
 
 * [Nix manual](https://nixos.org/nix/manual/)
 * [Nixpkgs manual](https://nixos.org/nixpkgs/manual/)
+* [NixOS manual](https://nixos.org/nixos/manual/)
 * [Nixops manual](https://nixos.org/nixops/manual/)
 * [Nix Pills](https://nixos.org/nixos/nix-pills/)
 * [NixOS wiki](https://nixos.wiki/)
