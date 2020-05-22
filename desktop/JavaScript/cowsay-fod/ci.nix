@@ -103,9 +103,6 @@ in
      * Release
      */
 
-    # FIXME not working
-    nodeTarball = build.tarball;
-
     snapPackage = snapTools.makeSnap {
       meta = {
         name = build.pname;

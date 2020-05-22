@@ -172,12 +172,10 @@ Overview of available ways of getting dependencies in examples by dependency too
 - `desktop/JavaScript/cowsay`
     - Source: [https://github.com/piuccio/cowsay](https://github.com/piuccio/cowsay)
     - Project does not contain `package-lock.json`, so it was added.
-    - In `package.json` was removed `rollup -c` from prepublish script.
 
 - `desktop/JavaScript/cowsay-fod`
     - Source: [https://github.com/piuccio/cowsay](https://github.com/piuccio/cowsay)
     - Project does not contain `package-lock.json`, so it was added.
-    - In `package.json` was removed `rollup -c` from prepublish script.
 
 - `desktop/PHP/hello-pdf`
     - Source: [https://github.com/svanderburg/composer2nix](https://github.com/svanderburg/composer2nix)
