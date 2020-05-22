@@ -70,6 +70,7 @@ in
     '';
 
     buildPhase = ''
+      export npm_config_cache=$(mktemp -d)
       export PATH="$PWD/node_modules/.bin/:$PATH"
       npm install
     '';
