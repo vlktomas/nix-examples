@@ -96,10 +96,10 @@ If you need to have multiple packages in your project, then you have to create m
     overlays = [
       (self: super: {
         # add server app to pkgs
-        "${appServerPackageName}" = super.callPackage ./app.nix { inherit localFiles; };
+        "${appServerPackageName}" = super.callPackage ./server/app.nix { inherit localFiles; };
 
         # add client app to pkgs
-        "${appClientPackageName}" = super.callPackage ./app.nix { inherit localFiles; };
+        "${appClientPackageName}" = super.callPackage ./client/app.nix { inherit localFiles; };
       })
     ];
 
@@ -145,7 +145,7 @@ Please refer to [NixOS manual](https://nixos.org/nixos/manual/) for more info of
 
 ### cd.nix -- logical deployment specification
 
-It is possible to use Nix to describe an infrastructure for your project. Thr infrastructure can be composed of multiple servers (database server, web server, ...) or just one machine which imports `module.nix`. It is simply attribute set of NixOS configurations.. This infrastructure can be used to system tests (NixOS tests) or to deploy to real machines.
+It is possible to use Nix to describe an infrastructure for your project. The infrastructure can be composed of multiple servers (database server, web server, ...) or just one machine which imports `module.nix`. It is simply attribute set of NixOS configurations.. This infrastructure can be used to system tests (NixOS tests) or to deploy to real machines.
 
 ### cd-*.nix -- physical deployment specification for NixOps
 
