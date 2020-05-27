@@ -188,18 +188,7 @@ in
       composer dump-autoload --optimize
       rm .env
       ln -s ${envFile} .env
-      #php artisan key:generate
-      #sed -i "s:APP_KEY=.*:APP_KEY=${toString appKey}:" .env
-      #sed -i "s:APP_STORAGE_PATH=.*:APP_STORAGE_PATH=${toString appStoragePath}:" .env
-      #sed -i "s:DB_HOST=.*:DB_HOST=${toString dbHost}:" .env
-      #sed -i "s:DB_PORT=.*:DB_PORT=${toString dbPort}:" .env
-      #sed -i "s:DB_SOCKET=.*:DB_SOCKET=${toString dbSocket}:" .env
-      #sed -i "s:DB_DATABASE=.*:DB_DATABASE=${toString dbName}:" .env
-      #sed -i "s:DB_USERNAME=.*:DB_USERNAME=${toString dbUsername}:" .env
-      #sed -i "s:DB_PASSWORD=.*:DB_PASSWORD=${toString dbPassword}:" .env
-      #npm run prod
-      export NODE_ENV=production
-      node node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js
+      npm run prod
     '';
 
     installPhase = ''
