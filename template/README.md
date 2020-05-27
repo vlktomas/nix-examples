@@ -43,6 +43,7 @@ If your project language or build system is not in examples, then you can:
 Here you can specify an exact version of Nixpkgs repository, so the build of your package is reproducible. At the beginning of this file you can find some comments which show how this can be specified. Actually there must be defined `defaultNixpkgsSource` attribute which contains the path to Nixpkgs repository. For example:
 
 ```nix
+let
   # use remote Nixpkgs tarball
   defaultNixpkgsSource = fetchTarball https://github.com/NixOS/nixpkgs/archive/20.03.tar.gz;
 
@@ -57,13 +58,17 @@ Here you can specify an exact version of Nixpkgs repository, so the build of you
 
   # use Nixpkgs directory
   defaultNixpkgsSource = "/absolute/path/to/nixpkgs/directory";
+in
+  {
+    # ...
+  }
 ```
 
 Next, the app derivation is added to Nixpkgs as `appPackageName`.
 
 ```nix
-
-  ...
+{
+  # ...
 
     overlays = [
       (self: super: {
@@ -73,12 +78,12 @@ Next, the app derivation is added to Nixpkgs as `appPackageName`.
       ];
     ];
 
-  ...
+  # ...
 
   appPackageName = "example";
 
-  ...
-
+  # ...
+}
 ```
 
 It means that your package will be placed in Nixpkgs as `example` package, so you can refer to it as `pkgs.example`. You can modify this package name but it isn't really neccessary if you never mind.
@@ -86,8 +91,8 @@ It means that your package will be placed in Nixpkgs as `example` package, so yo
 If you need to have multiple packages in your project, then you have to create multiple package attributes and add this packages to Nixpkgs. So you do something like this:
 
 ```nix
-
-  ...
+{
+  # ...
 
     overlays = [
       (self: super: {
@@ -99,12 +104,13 @@ If you need to have multiple packages in your project, then you have to create m
       })
     ];
 
-  ...
+  # ...
 
   appServerPackageName = "server";
   appClientPackageName = "client";
 
-  ...
+  # ...
+}
 
 ```
 
