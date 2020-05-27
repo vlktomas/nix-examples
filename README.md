@@ -4,8 +4,8 @@ This repository serves as comprehensive list of Nix examples for various technol
 
 Each project contains from five to nine `.nix` files and optionally deploy script `cicd.sh`:
 
-* `nixpkgs.nix` -- pin of Nixpkgs and its configuration and add app as overlay
 * `app.nix` -- app derivation (can be easily integrated into Nixpkgs tree or own packages tree)
+* `nixpkgs.nix` -- pin of Nixpkgs and its configuration and add app as overlay
 * `default.nix` -- calls package from pinned Nixpkgs
 * `shell.nix` -- similar to `default.nix`, but overriding some attributes or adding some dev tools
 * `ci.nix` -- set of available CI jobs
@@ -55,7 +55,7 @@ You can switch from local files to remote files:
 nix-build --arg localFiles false
 ```
 
-You can build project with different Nixpkgs:
+You can build the project with different Nixpkgs:
 ```bash
 nix-build --arg nixpkgsSource "<nixpkgs>"
 nix-build --arg nixpkgsSource "/absolute/path/to/nixpkgs/directory"
@@ -208,7 +208,7 @@ Overview of available ways of getting dependencies in examples by dependency too
 * [Nix manual](https://nixos.org/nix/manual/)
 * [Nixpkgs manual](https://nixos.org/nixpkgs/manual/)
 * [NixOS manual](https://nixos.org/nixos/manual/)
-* [Nixops manual](https://nixos.org/nixops/manual/)
+* [NixOps manual](https://nixos.org/nixops/manual/)
 * [Nix Pills](https://nixos.org/nixos/nix-pills/)
 * [NixOS wiki](https://nixos.wiki/)
 * [NixOS/nixpkgs](https://github.com/NixOS/nixpkgs)
