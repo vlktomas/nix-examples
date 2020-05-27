@@ -74,8 +74,7 @@ Next, the app derivation is added to Nixpkgs as `appPackageName`.
       (self: super: {
           # add this app to pkgs
           "${appPackageName}" = super.callPackage ./app.nix { inherit localFiles; };
-        })
-      ];
+      })
     ];
 
   # ...
