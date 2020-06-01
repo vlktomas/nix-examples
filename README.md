@@ -131,7 +131,7 @@ Overview of available ways of getting dependencies in examples by dependency too
 
  * This repo contains source code of common public projects as is. Source files are included in repo only for convenience. If you think that it's violating some license rules please let me know. But keep in mind that this is not real project, included source files are not used for commercial reasons.
 
- * Some source code of projects had to be a little bit modified. For example JavaScript cowsay repo does not contain `package-lock.json`, so this file was added. See [Example specific notes](#example-specific-notes) below for other changes.
+ * Some source code of projects had to be modified a little bit. For example JavaScript cowsay repo does not contain `package-lock.json`, so this file was added. See [Example specific notes](#example-specific-notes) below for other changes.
 
  * Each example is self contained and does not have dependency on other files out of its folder. So a lot of code is repeating but it is intentional.
 
