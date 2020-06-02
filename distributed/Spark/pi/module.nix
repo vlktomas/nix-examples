@@ -139,7 +139,7 @@ in
 
       networking.firewall.allowedTCPPorts =
         (optionals cfg.master [ cfg.masterPort cfg.masterWebUIPort cfg.driverPort cfg.UIPort cfg.blockManagerPort ]) ++
-        (optionals cfg.worker [ cfg.workerPort cfg.workerWebUIPort ]);
+        (optionals cfg.worker [ cfg.workerPort cfg.workerWebUIPort cfg.blockManagerPort ]);
 
       environment.systemPackages = [ pkgs.spark ];
 

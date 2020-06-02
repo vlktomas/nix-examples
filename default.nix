@@ -35,22 +35,25 @@ rec {
 
   };
 
-  # all builds
+  # all examples attributes names
+  examplesAttrsNames = mapAttrsToList (name: value: "${name}") examples;
+
+  # all examples builds
   examplesBuilds = forEach (attrValues examples) (example: example.build);
   #examplesBuilds = catAttrs "build" (attrValues examples);
 
-  # all builds attribute set (something like repository of all examples)
+  # all examples builds attribute set (something like repository of all examples)
   examplesBuildsAttrSet = mapAttrs (name: value: value.build) examples;
 
-  # all pipelines
+  # all examples pipelines
   examplesPipelines = forEach (attrValues examples) (example: example.pipeline);
   #examplesPipelines = catAttrs "pipeline" (attrValues examples);
 
-  # all pipelines jobs
+  # all examples pipelines jobs
   examplesPipelinesJobs = forEach (attrValues examples) (example: example.pipelineJob);
   #examplesPipelinesJobs = catAttrs "pipelineJob" (attrValues examples);
 
-  # all pipelines phases merged
+  # all examples pipelines phases merged
   examplesPipelinesZipped =
     let
       zipPipelines = a: b:
@@ -61,7 +64,7 @@ rec {
     in
       foldl zipPipelines [] examplesPipelines;
 
-  # all pipelines phase of given name (each phase has dependency on all preceding phases)
+  # all examples pipelines phase of given name (each phase has dependency on all preceding phases)
   examplesPipelinePhase = phaseName:
     flatten (
       forEach

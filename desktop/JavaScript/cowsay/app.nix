@@ -66,4 +66,13 @@ in
       executable = pname;
     };
 
+    meta = with stdenv.lib; {
+      description = "Cowsay";
+      longDescription = "Program which prints cow saying some words.";
+      homepage = https://example.com/;
+      license = licenses.gpl3Plus;
+      maintainers = [];
+      platforms = platforms.all;
+    };
+
   })

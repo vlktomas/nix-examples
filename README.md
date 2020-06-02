@@ -16,41 +16,19 @@ Each project contains from five to nine `.nix` files and optionally deploy scrip
 
 To start new project just copy `template` directory, which contains these files with additional info. There is also an example configuration for some CI/CD tools, but beware that NixOS testing will not work in those, which use virtual machines or Docker.
 
-## How to use
+## How to use some example project
 
 Install Nix:
 ```bash
 curl https://nixos.org/nix/install | sh
 ```
 
-Build all examples:
-```bash
-nix-build -A examplesBuilds
-```
-
-Run all examples CI pipelines (memory intensive):
-```bash
-nix-build -A examplesPipelinesJobs
-```
-
-Run all examples CI pipelines up to second phase (numbered from zero):
-```bash
-nix-build -A examplesPipelinesZipped.1
-```
-
-Run all examples CI pipelines up to "test" phase:
-```bash
-nix-build -E '(import ./default.nix).examplesPipelinePhase "test"'
-```
-
-### How to use each example 
-
 Build project:
 ```bash
 nix-build
 ```
 
-You can switch from local files to remote files:
+You can switch from local files to remote files (if remote repostiory exists):
 ```bash
 nix-build --arg localFiles false
 ```
@@ -104,6 +82,33 @@ Test NixOps deployment in VirtualBox
 Run CI pipeline and deploy with NixOps
 ```bash
 ./cicd.sh
+```
+
+### Available commands in repository root
+
+Build all examples:
+```bash
+nix-build -A examplesBuilds
+```
+
+Run all examples CI pipelines [memory intensive]:
+```bash
+nix-build -A examplesPipelinesJobs
+```
+
+Run all examples CI pipelines up to second phase (numbered from zero) [memory intensive]:
+```bash
+nix-build -A examplesPipelinesZipped.1
+```
+
+Run all examples CI pipelines up to "test" phase [memory intensive]:
+```bash
+nix-build -E '(import ./default.nix).examplesPipelinePhase "test"'
+```
+
+Get examples attributes names as JSON:
+```bash
+nix-instantiate -E '(import ./default.nix).examplesAttrsNames' --eval --strict --json | jq
 ```
 
 ### Project dependencies

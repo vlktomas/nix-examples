@@ -22,13 +22,18 @@ let
 
   mkDependency = prev: next: next.overrideAttrs (oldAttrs: { prev = prev; });
 
-  phase = phaseName: jobs: pkgs.symlinkJoin {
-    name = "phase-${phaseName}";
-    paths = [ jobs ];
-    postBuild = ''
-      echo -e "\033[0;32m<<< completed ${phaseName} phase >>>\033[0m"
-    '';
-  };
+  phase = name: jobs:
+    let
+      # backport (linkFarmFromDrvs isn't in Nixpkgs 20.03)
+      linkFarmFromDrvs =
+        let mkEntryFromDrv = drv: { name = drv.name; path = drv; };
+        in pkgs.linkFarm name (map mkEntryFromDrv jobs);
+    in
+      pkgs.runCommand "phase-${name}" {} ''
+        mkdir -p $out
+        cd $out
+        ln -s ${linkFarmFromDrvs} ${name}
+      '';
 
   gatherPipelineOutput = pipeline: pkgs.symlinkJoin {
     name = "pipeline";
@@ -56,6 +61,14 @@ in
      * Test
      */
 
+    scriptTest = runCommand "${build.pname}-test"
+      { nativeBuildInputs = [ build qpdf ]; }
+      ''
+        mkdir -p $out/tests/${build.pname}-test
+        qpdf --check ${build}/${build.pdf}
+      ''
+    ;
+
 
     /*
      * Release
@@ -74,6 +87,7 @@ in
       )
       (
         phase "test" [
+          scriptTest
         ]
       )
       (

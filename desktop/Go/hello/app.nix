@@ -31,6 +31,9 @@ buildGoModule rec {
 
   meta = with stdenv.lib; {
     description = "Hello world example in Go";
+    longDescription = ''
+      Long description for Hello world example in Go.
+    '';
     homepage = https://blog.golang.org/using-go-modules;
     license = licenses.asl20;
     maintainers = [];

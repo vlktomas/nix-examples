@@ -30,13 +30,18 @@ let
 
   mkDependency = prev: next: next.overrideAttrs (oldAttrs: { prev = prev; });
 
-  phase = phaseName: jobs: pkgs.symlinkJoin {
-    name = "phase-${phaseName}";
-    paths = [ jobs ];
-    postBuild = ''
-      echo -e "\033[0;32m<<< completed ${phaseName} phase >>>\033[0m"
-    '';
-  };
+  phase = name: jobs:
+    let
+      # backport (linkFarmFromDrvs isn't in Nixpkgs 20.03)
+      linkFarmFromDrvs =
+        let mkEntryFromDrv = drv: { name = drv.name; path = drv; };
+        in pkgs.linkFarm name (map mkEntryFromDrv jobs);
+    in
+      pkgs.runCommand "phase-${name}" {} ''
+        mkdir -p $out
+        cd $out
+        ln -s ${linkFarmFromDrvs} ${name}
+      '';
 
   gatherPipelineOutput = pipeline: pkgs.symlinkJoin {
     name = "pipeline";
@@ -74,6 +79,7 @@ in
      */
 
     nixosVmTest = nixosTest {
+      name = "${client.build.pname}-nixos-vm-test";
       nodes = deploymentNodes;
       testScript = ''
         server.start()
@@ -85,21 +91,23 @@ in
 
     nixosVmTestDriver = nixosVmTest.driver;
 
-    nixosVmTestDistributed = nixosTest {
+    nixosVmDistributedTest = nixosTest {
+      name = "${client.build.pname}-nixos-vm-distributed-test";
       nodes = deploymentNodesDistributed;
       testScript = ''
         server.start()
         client.start()
         server.wait_for_unit("default.target")
         client.wait_for_unit("default.target")
-        if not "Hello World!" in server.succeed("${client.build.executable}-wrapped"):
+        if not "Hello World!" in client.succeed("${client.build.executable}-wrapped"):
             raise Exception("Bad client output")
       '';
     };
 
-    nixosVmTestDistributedDriver = nixosVmTestDistributed.driver;
+    nixosVmDistributedTestDriver = nixosVmDistributedTest.driver;
 
     nixosVmContainerTest = nixosTest {
+      name = "${client.build.pname}-nixos-vm-container-test";
       machine = { config, ... }: {
         nixpkgs.pkgs = pkgs;
         containers = {
@@ -141,6 +149,7 @@ in
     nixosVmContainerTestDriver = nixosVmContainerTest.driver;
 
     nixosVmContainerDistributedTest = nixosTest {
+      name = "${client.build.pname}-nixos-vm-container-distributed-test";
       machine = { config, ... }: {
         nixpkgs.pkgs = pkgs;
         containers = {
@@ -246,22 +255,35 @@ in
     pipeline = mkPipelineList [
       (
         phase "build" [
+          # build server and client or execute server and client pipeline
           server.build
           client.build
+          #(server.pipelineJob.overrideAttrs (oldAttrs: { name = "server-pipeline"; }))
+          #(client.pipelineJob.overrideAttrs (oldAttrs: { name = "client-pipeline"; }))
         ]
       )
       (
         phase "test" [
           nixosVmTest
+          nixosVmDistributedTest
           nixosVmContainerTest
+          nixosVmContainerDistributedTest
           #nixopsDeployTest
         ]
       )
       (
         phase "release" [
-          # run server and client pipeline up to release phase
-          (builtins.filter (phase: phase.name == "phase-release") server.pipeline)
-          (builtins.filter (phase: phase.name == "phase-release") client.pipeline)
+        ]
+      )
+      # run server and client pipeline up to release phase
+      (
+        phase "release-server" [
+          (builtins.head (builtins.filter (phase: phase.name == "phase-release") server.pipeline))
+        ]
+      )
+      (
+        phase "release-client" [
+          (builtins.head (builtins.filter (phase: phase.name == "phase-release") client.pipeline))
         ]
       )
     ];

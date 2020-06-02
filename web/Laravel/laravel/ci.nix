@@ -27,13 +27,18 @@ let
 
   mkDependency = prev: next: next.overrideAttrs (oldAttrs: { prev = prev; });
 
-  phase = phaseName: jobs: pkgs.symlinkJoin {
-    name = "phase-${phaseName}";
-    paths = [ jobs ];
-    postBuild = ''
-      echo -e "\033[0;32m<<< completed ${phaseName} phase >>>\033[0m"
-    '';
-  };
+  phase = name: jobs:
+    let
+      # backport (linkFarmFromDrvs isn't in Nixpkgs 20.03)
+      linkFarmFromDrvs =
+        let mkEntryFromDrv = drv: { name = drv.name; path = drv; };
+        in pkgs.linkFarm name (map mkEntryFromDrv jobs);
+    in
+      pkgs.runCommand "phase-${name}" {} ''
+        mkdir -p $out
+        cd $out
+        ln -s ${linkFarmFromDrvs} ${name}
+      '';
 
   gatherPipelineOutput = pipeline: pkgs.symlinkJoin {
     name = "pipeline";
@@ -62,6 +67,7 @@ in
      */
 
     nixosVmTest = nixosTest {
+      name = "${build.pname}-nixos-vm-test";
       nodes = deploymentNodes // {
         client = { pkgs, ... }: {
           environment.systemPackages = with pkgs; [ curl ];
@@ -81,7 +87,8 @@ in
 
     nixosVmTestDriver = nixosVmTest.driver;
 
-    nixosVmTestDistributed = nixosTest {
+    nixosVmDistributedTest = nixosTest {
+      name = "${build.pname}-nixos-vm-distributed-test";
       nodes = deploymentNodesDistributed // {
         client = { pkgs, ... }: {
           environment.systemPackages = with pkgs; [ curl ];
@@ -103,9 +110,10 @@ in
       '';
     };
 
-    nixosVmTestDistributedDriver = nixosVmTestDistributed.driver;
+    nixosVmDistributedTestDriver = nixosVmDistributedTest.driver;
 
     nixosVmContainerTest = nixosTest {
+      name = "${build.pname}-nixos-vm-container-test";
       machine = { config, ... }: {
         nixpkgs.pkgs = pkgs;
         containers = {
@@ -166,6 +174,7 @@ in
     nixosVmContainerTestDriver = nixosVmContainerTest.driver;
 
     nixosVmContainerDistributedTest = nixosTest {
+      name = "${build.pname}-nixos-vm-container-distributed-test";
       machine = { config, ... }: {
         containers = {
           fileserver = {
@@ -317,7 +326,7 @@ in
       (
         phase "test" [
           nixosVmTest
-          nixosVmTestDistributed
+          nixosVmDistributedTest
           nixosVmContainerTest
           nixosVmContainerDistributedTest
           #nixopsDeployTest

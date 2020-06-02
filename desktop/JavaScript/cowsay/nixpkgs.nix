@@ -21,6 +21,6 @@ in
         ];
       };
       appPackage = pkgs."${appPackageName}";
-      appPackageName = "cowsay-fod";
+      appPackageName = "cowsay";
       outPath = "${nixpkgs}";
     }

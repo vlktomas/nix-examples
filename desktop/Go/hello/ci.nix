@@ -22,13 +22,18 @@ let
 
   mkDependency = prev: next: next.overrideAttrs (oldAttrs: { prev = prev; });
 
-  phase = phaseName: jobs: pkgs.symlinkJoin {
-    name = "phase-${phaseName}";
-    paths = [ jobs ];
-    postBuild = ''
-      echo -e "\033[0;32m<<< completed ${phaseName} phase >>>\033[0m"
-    '';
-  };
+  phase = name: jobs:
+    let
+      # backport (linkFarmFromDrvs isn't in Nixpkgs 20.03)
+      linkFarmFromDrvs =
+        let mkEntryFromDrv = drv: { name = drv.name; path = drv; };
+        in pkgs.linkFarm name (map mkEntryFromDrv jobs);
+    in
+      pkgs.runCommand "phase-${name}" {} ''
+        mkdir -p $out
+        cd $out
+        ln -s ${linkFarmFromDrvs} ${name}
+      '';
 
   gatherPipelineOutput = pipeline: pkgs.symlinkJoin {
     name = "pipeline";
@@ -87,6 +92,7 @@ in
     ;
 
     nixosVmTest = nixosTest {
+      name = "${build.pname}-nixos-vm-test";
       machine = { ... }: {
         nixpkgs.pkgs = pkgs;
         imports = [ ./module.nix ];
@@ -101,6 +107,7 @@ in
     nixosVmTestDriver = nixosVmTest.driver;
 
     nixosVmContainerTest = nixosTest {
+      name = "${build.pname}-nixos-vm-container-test";
       machine = { ... }: {
         nixpkgs.pkgs = pkgs;
         containers."${build.pname}" = {

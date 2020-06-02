@@ -37,6 +37,10 @@ in
       cp project.pdf $out/
     '';
 
+    passthru = {
+      pdf = "project.pdf";
+    };
+
     meta = with stdenv.lib; {
       description = "Example LaTeX document";
       longDescription = ''
