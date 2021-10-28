@@ -5,7 +5,7 @@ DEPLOYMENT_NAME="pi"
 NIX_PATH="nixpkgs=$(nix-instantiate -E '(import ./nixpkgs.nix {}).outPath' --eval | tr -d '"')"
 
 # process arguments
-if [ $1 = "deploy-test" ]; then
+if [ "$1" = "deploy-test" ]; then
     # deploy test with VirtualBox
     DEPLOYMENT_VBOX_NAME=${DEPLOYMENT_NAME}-vbox
     # delete deployment if exists
