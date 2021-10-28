@@ -131,6 +131,7 @@ Overview of available ways of getting dependencies in examples by dependency too
 | NPM              | --                      | :heavy_check_mark:                 | :heavy_check_mark:                   |
 | Composer         | --                      | --                                 | :heavy_check_mark:                   |
 | Pip              | :heavy_check_mark:      | --                                 | --                                   |
+| Poetry           | --                      | :heavy_check_mark:                 | --                                   |
 
 ## Notes
 
